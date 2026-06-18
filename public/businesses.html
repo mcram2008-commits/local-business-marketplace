@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse Businesses — LocalBiz</title>
+  <meta name="description" content="Browse and filter local businesses by category, location, and rating.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/business.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav id="main-nav"></nav>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="container">
+      <h1>Browse Businesses</h1>
+      <p>Find and connect with trusted local businesses near you</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="browse-layout">
+      
+      <!-- Filters Sidebar -->
+      <aside class="browse-sidebar">
+        <div class="glass-card filter-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+            <h3 style="font-family:Outfit; font-size:1.2rem; font-weight:700;">Filters</h3>
+            <button id="btn-reset-filters" class="btn btn-outline btn-sm" style="padding: 4px 8px; font-size: 0.75rem;">Reset All</button>
+          </div>
+
+          <!-- Search Input -->
+          <div class="filter-section">
+            <h4 class="filter-title">Keywords</h4>
+            <div class="input-group">
+              <span class="input-icon">🔍</span>
+              <input type="text" id="filter-search" class="form-control" placeholder="Search by name, tags..." style="padding-left: 36px;" aria-label="Search keywords">
+            </div>
+          </div>
+
+          <!-- Category Checkboxes -->
+          <div class="filter-section">
+            <h4 class="filter-title">Categories</h4>
+            <div id="category-filter-list">
+              <!-- Dynamically populated categories -->
+            </div>
+          </div>
+
+          <!-- Location Dropdown -->
+          <div class="filter-section">
+            <h4 class="filter-title">Location</h4>
+            <select id="filter-location" class="form-control" aria-label="Filter Location">
+              <option value="">All Cities</option>
+              <!-- Dynamically populated cities -->
+            </select>
+          </div>
+
+          <!-- Min Rating Selector -->
+          <div class="filter-section">
+            <h4 class="filter-title">Minimum Rating</h4>
+            <select id="filter-rating" class="form-control" aria-label="Minimum Rating">
+              <option value="0">Any Rating</option>
+              <option value="4.5">4.5★ &amp; Above</option>
+              <option value="4.0">4.0★ &amp; Above</option>
+              <option value="3.5">3.5★ &amp; Above</option>
+              <option value="3.0">3.0★ &amp; Above</option>
+            </select>
+          </div>
+
+          <!-- Verified Only Toggle -->
+          <div class="filter-section">
+            <h4 class="filter-title">Status</h4>
+            <label class="filter-check">
+              <input type="checkbox" id="filter-verified" aria-label="Verified only">
+              <span>Verified Businesses Only</span>
+            </label>
+          </div>
+
+        </div>
+      </aside>
+
+      <!-- Main Business List -->
+      <main class="browse-main">
+        <div class="sort-bar">
+          <p class="results-count"><strong id="results-count">0</strong> businesses found</p>
+          <div style="display:flex; align-items:center; gap: 8px;">
+            <label for="sort-select" style="font-size:0.85rem; color:var(--text-secondary); white-space:nowrap;">Sort by:</label>
+            <select id="sort-select" class="form-control" style="width:auto; padding: 6px 12px; font-size: 0.85rem;">
+              <option value="newest">Newest First</option>
+              <option value="rating">Highest Rated</option>
+              <option value="name">A-Z</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="business-grid" class="business-grid">
+          <!-- Dynamically populated business cards -->
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="main-footer" style="background: var(--navy-light); border-top: 1px solid var(--border); padding: 40px 0 30px; margin-top: 60px;">
+    <div class="container footer-bottom" style="display:flex; justify-content:space-between; align-items:center; color:var(--text-muted); font-size:0.8rem;">
+      <div>&copy; 2026 LocalBiz Marketplace. All rights reserved.</div>
+      <div>Made with ❤️ for local growth</div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/businesses.js"></script>
+</body>
+</html>

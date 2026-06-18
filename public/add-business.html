@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Business — LocalBiz</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/forms.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav id="main-nav"></nav>
+
+  <div class="content-area">
+    <div class="container">
+      
+      <div class="form-layout">
+        <div class="card form-card">
+          
+          <div class="form-header">
+            <h1 class="form-title" id="form-title-text">🏪 Register Your Business</h1>
+            <p class="form-subtitle" id="form-subtitle-text">Fill in details below to list your business in the marketplace</p>
+          </div>
+
+          <form id="business-form">
+            <!-- Business Name -->
+            <div class="form-group">
+              <label class="form-label" for="biz-name">Business Name</label>
+              <input type="text" id="biz-name" class="form-control" placeholder="e.g. Ram Fitness Gym, Glow Beauty Spa" required>
+            </div>
+
+            <div class="form-row">
+              <!-- Category -->
+              <div class="form-group">
+                <label class="form-label" for="biz-category">Category</label>
+                <select id="biz-category" class="form-control" required>
+                  <option value="" disabled selected>Select Category</option>
+                  <option value="Restaurants">Restaurants</option>
+                  <option value="Beauty & Spa">Beauty & Spa</option>
+                  <option value="Home Services">Home Services</option>
+                  <option value="Fitness">Fitness</option>
+                  <option value="Education">Education</option>
+                  <option value="Healthcare">Healthcare</option>
+                  <option value="Automotive">Automotive</option>
+                  <option value="Travel">Travel</option>
+                </select>
+              </div>
+
+              <!-- Phone -->
+              <div class="form-group">
+                <label class="form-label" for="biz-phone">Contact Number</label>
+                <input type="tel" id="biz-phone" class="form-control" placeholder="e.g. 9812345678" pattern="[0-9]{10}" required>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+              <label class="form-label" for="biz-email">Business Email</label>
+              <input type="email" id="biz-email" class="form-control" placeholder="e.g. info@business.com" required>
+            </div>
+
+            <!-- Address -->
+            <div class="form-group">
+              <label class="form-label" for="biz-address">Address</label>
+              <input type="text" id="biz-address" class="form-control" placeholder="e.g. 12 Anna Salai" required>
+            </div>
+
+            <div class="form-row">
+              <!-- City -->
+              <div class="form-group">
+                <label class="form-label" for="biz-city">City</label>
+                <input type="text" id="biz-city" class="form-control" placeholder="e.g. Chennai, Mumbai" required>
+              </div>
+
+              <!-- State -->
+              <div class="form-group">
+                <label class="form-label" for="biz-state">State</label>
+                <input type="text" id="biz-state" class="form-control" placeholder="e.g. Tamil Nadu, Maharashtra" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <!-- Opening Time -->
+              <div class="form-group">
+                <label class="form-label" for="biz-open">Opening Time</label>
+                <input type="time" id="biz-open" class="form-control" required value="09:00">
+              </div>
+
+              <!-- Closing Time -->
+              <div class="form-group">
+                <label class="form-label" for="biz-close">Closing Time</label>
+                <input type="time" id="biz-close" class="form-control" required value="20:00">
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+              <label class="form-label" for="biz-desc">Description</label>
+              <textarea id="biz-desc" class="form-control" placeholder="Provide a detailed description of your business, specialties, products, or service offerings..." required></textarea>
+            </div>
+
+            <!-- Logo Upload -->
+            <div class="form-group">
+              <label class="form-label" for="biz-logo-file">Business Logo Image</label>
+              <input type="file" id="biz-logo-file" class="form-control" accept="image/*">
+              <input type="hidden" id="biz-logo-url">
+              <div id="logo-preview-container" style="margin-top: 10px; display: none;">
+                <img id="logo-preview" src="" alt="Logo Preview" style="max-height: 100px; border-radius: 8px; border: 1px solid var(--border);">
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div style="display:flex; gap:12px; margin-top:30px;">
+              <button type="submit" class="btn btn-primary" id="btn-submit-text" style="flex:2">Register Business</button>
+              <a href="dashboard-owner.html" class="btn btn-ghost" style="flex:1">Cancel</a>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    let currentUser = null;
+    let editBizId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Guard Owner route
+      Auth.requireRole('owner');
+      currentUser = Auth.getCurrentUser();
+
+      // Render Navigation
+      App.renderNav();
+
+      // Check edit status
+      editBizId = App.getParam('id');
+      if (editBizId) {
+        setupEditForm();
+      } else {
+        // Pre-fill email
+        if (currentUser) {
+          document.getElementById('biz-email').value = currentUser.email;
+        }
+      }
+
+      // Handle logo selection preview
+      const logoInput = document.getElementById('biz-logo-file');
+      if (logoInput) {
+        logoInput.addEventListener('change', () => {
+          const file = logoInput.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const preview = document.getElementById('logo-preview');
+              preview.src = e.target.result;
+              document.getElementById('logo-preview-container').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+
+      // Handle submit
+      const form = document.getElementById('business-form');
+      form.addEventListener('submit', handleFormSubmit);
+    });
+
+    function setupEditForm() {
+      const biz = Store.getBusinessById(editBizId);
+      
+      // Safety checks
+      if (!biz) {
+        window.location.href = 'dashboard-owner.html';
+        return;
+      }
+      if (biz.ownerId !== currentUser.id) {
+        window.location.href = 'dashboard-owner.html';
+        return;
+      }
+
+      // Adjust Labels
+      document.getElementById('form-title-text').textContent = '✏️ Edit Business Details';
+      document.getElementById('form-subtitle-text').textContent = 'Update details for your business profile';
+      document.getElementById('btn-submit-text').textContent = 'Save Changes';
+
+      // Pre-fill
+      document.getElementById('biz-name').value = biz.name;
+      document.getElementById('biz-category').value = biz.category;
+      document.getElementById('biz-phone').value = biz.phone;
+      document.getElementById('biz-email').value = biz.email || '';
+      document.getElementById('biz-address').value = biz.address;
+      document.getElementById('biz-city').value = biz.city;
+      document.getElementById('biz-state').value = biz.state;
+      document.getElementById('biz-open').value = biz.openTime || '09:00';
+      document.getElementById('biz-close').value = biz.closeTime || '20:00';
+      document.getElementById('biz-desc').value = biz.description;
+      
+      // Pre-fill logo preview
+      if (biz.logo) {
+        document.getElementById('biz-logo-url').value = biz.logo;
+        document.getElementById('logo-preview').src = biz.logo;
+        document.getElementById('logo-preview-container').style.display = 'block';
+      }
+    }
+
+    function uploadFile(fileInputId, callback) {
+      const fileInput = document.getElementById(fileInputId);
+      if (!fileInput || !fileInput.files.length) {
+        callback(null);
+        return;
+      }
+      
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const token = localStorage.getItem('lbm_token');
+      try {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/upload', false); // Synchronous upload to keep it inline with store.js sync behavior
+        if (token) {
+          xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+        }
+        xhr.send(formData);
+        
+        if (xhr.status === 200) {
+          const res = JSON.parse(xhr.responseText);
+          callback(res.url);
+        } else {
+          let errMsg = 'Failed to upload image';
+          try {
+            const errObj = JSON.parse(xhr.responseText);
+            errMsg = errObj.error || errMsg;
+          } catch {}
+          App.showToast(errMsg, 'error');
+          callback(null);
+        }
+      } catch (err) {
+        console.error('Upload connection error:', err);
+        App.showToast('Network error during file upload', 'error');
+        callback(null);
+      }
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('biz-name').value.trim();
+      const category = document.getElementById('biz-category').value;
+      const phone = document.getElementById('biz-phone').value.trim();
+      const email = document.getElementById('biz-email').value.trim();
+      const address = document.getElementById('biz-address').value.trim();
+      const city = document.getElementById('biz-city').value.trim();
+      const state = document.getElementById('biz-state').value.trim();
+      const openTime = document.getElementById('biz-open').value;
+      const closeTime = document.getElementById('biz-close').value;
+      const description = document.getElementById('biz-desc').value.trim();
+
+      // Perform upload if file selected
+      let logoUrl = document.getElementById('biz-logo-url').value;
+      uploadFile('biz-logo-file', (uploadedUrl) => {
+        if (uploadedUrl) {
+          logoUrl = uploadedUrl;
+        }
+      });
+
+      const data = {
+        name, category, phone, email, address, city, state, openTime, closeTime, description, logo: logoUrl
+      };
+
+      if (editBizId) {
+        // Edit Mode
+        Store.updateBusiness(editBizId, data);
+        App.showToast('Business details updated successfully!', 'success');
+      } else {
+        // Create Mode
+        Store.createBusiness({
+          ownerId: currentUser.id,
+          ...data
+        });
+        App.showToast('Business registered successfully! Awaiting verification.', 'success');
+      }
+
+      // Redirect
+      setTimeout(() => {
+        window.location.href = 'dashboard-owner.html';
+      }, 1500);
+    }
+  </script>
+</body>
+</html>

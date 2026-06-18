@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Business Details — LocalBiz</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/business.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav id="main-nav"></nav>
+
+  <!-- Hero Banner -->
+  <div id="detail-hero" class="detail-hero">
+    <!-- Rendered dynamically -->
+  </div>
+
+  <!-- Main Container -->
+  <div class="container" style="padding-top: 30px; padding-bottom: 60px;">
+    
+    <!-- Tabs Navigation -->
+    <div class="detail-tabs">
+      <button class="tab-btn active" data-tab="overview">📋 Overview</button>
+      <button class="tab-btn" data-tab="services">🛎️ Services</button>
+      <button class="tab-btn" data-tab="reviews">⭐ Reviews</button>
+      <button class="tab-btn" data-tab="photos">📷 Photos</button>
+      <button class="tab-btn" data-tab="chat">💬 Chat</button>
+    </div>
+
+    <!-- Overview Tab Panel -->
+    <div id="tab-overview" class="tab-panel">
+      <!-- Rendered dynamically -->
+    </div>
+
+    <!-- Services Tab Panel -->
+    <div id="tab-services" class="tab-panel hidden">
+      <!-- Rendered dynamically -->
+    </div>
+
+    <!-- Reviews Tab Panel -->
+    <div id="tab-reviews" class="tab-panel hidden">
+      <!-- Rendered dynamically -->
+    </div>
+
+    <!-- Photos Tab Panel -->
+    <div id="tab-photos" class="tab-panel hidden">
+      <!-- Rendered dynamically -->
+    </div>
+
+    <!-- Chat Tab Panel -->
+    <div id="tab-chat" class="tab-panel hidden">
+      <!-- Rendered dynamically -->
+    </div>
+
+  </div>
+
+  <!-- BOOKING MODAL -->
+  <div id="booking-modal" class="modal-overlay hidden">
+    <div class="card modal-card">
+      <span class="modal-close" onclick="closeBookingModal()">&times;</span>
+      <h3 class="modal-title">📅 Book Appointment</h3>
+      <form id="booking-form">
+        <div class="form-group">
+          <label class="form-label" for="booking-service-select">Select Service</label>
+          <select id="booking-service-select" class="form-control" required>
+            <!-- Services options -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="booking-date">Select Date</label>
+          <input type="date" id="booking-date" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="booking-time-select">Available Time Slots</label>
+          <select id="booking-time-select" class="form-control" required>
+            <!-- Available slots -->
+          </select>
+        </div>
+        <div class="form-group" style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px">
+            <span style="color:var(--text-secondary)">Service Price:</span>
+            <span id="booking-price-val" style="font-weight:700">₹0</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:1.1rem; border-top:1px solid var(--border); padding-top:8px">
+            <strong>Total Amount:</strong>
+            <strong id="booking-total-val" class="gradient-text">₹0</strong>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px">Confirm Booking &amp; Pay</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- REVIEW MODAL -->
+  <div id="review-modal" class="modal-overlay hidden">
+    <div class="card modal-card">
+      <span class="modal-close" onclick="closeReviewModal()">&times;</span>
+      <h3 class="modal-title">⭐ Write a Review</h3>
+      <form id="review-form">
+        <div class="form-group">
+          <label class="form-label">Your Rating</label>
+          <div class="star-selector" id="review-star-selector">
+            <span data-value="1">★</span>
+            <span data-value="2">★</span>
+            <span data-value="3">★</span>
+            <span data-value="4">★</span>
+            <span data-value="5">★</span>
+          </div>
+          <input type="hidden" id="review-rating-input" required value="">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="review-comment">Your Review</label>
+          <textarea id="review-comment" class="form-control" placeholder="Share your experience working with this business..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px">Submit Review</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/booking.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/business-detail.js"></script>
+</body>
+</html>

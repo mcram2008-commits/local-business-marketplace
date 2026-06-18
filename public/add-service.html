@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Service — LocalBiz</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/forms.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav id="main-nav"></nav>
+
+  <div class="content-area">
+    <div class="container">
+      
+      <div class="form-layout">
+        <div class="card form-card">
+          
+          <div class="form-header">
+            <h1 class="form-title" id="form-title-text">🛎️ Add New Service</h1>
+            <p class="form-subtitle" id="form-subtitle-text">Define service details that customers can select and book</p>
+          </div>
+
+          <form id="service-form">
+            
+            <!-- Target Business (read-only info) -->
+            <div class="form-group">
+              <label class="form-label">Business Account</label>
+              <input type="text" id="target-biz-name" class="form-control" readonly style="background:rgba(255,255,255,0.01); color:var(--text-secondary); cursor:not-allowed;" aria-label="Business Account">
+              <input type="hidden" id="target-biz-id">
+            </div>
+
+            <!-- Service Name -->
+            <div class="form-group">
+              <label class="form-label" for="svc-name">Service Name</label>
+              <input type="text" id="svc-name" class="form-control" placeholder="e.g. Personal Training Session, Hair Treatment" required>
+            </div>
+
+            <div class="form-row">
+              <!-- Price -->
+              <div class="form-group">
+                <label class="form-label" for="svc-price">Price (₹)</label>
+                <input type="number" id="svc-price" class="form-control" placeholder="e.g. 1500" min="0" required>
+              </div>
+
+              <!-- Duration -->
+              <div class="form-group">
+                <label class="form-label" for="svc-duration">Duration</label>
+                <select id="svc-duration" class="form-control" required>
+                  <option value="" disabled selected>Select Duration</option>
+                  <option value="30 min">30 min</option>
+                  <option value="45 min">45 min</option>
+                  <option value="1 hour">1 hour</option>
+                  <option value="1.5 hours">1.5 hours</option>
+                  <option value="2 hours">2 hours</option>
+                  <option value="3 hours">3 hours</option>
+                  <option value="Half day">Half day</option>
+                  <option value="Full day">Full day</option>
+                  <option value="Monthly">Monthly</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="form-group">
+              <label class="form-label" for="svc-desc">Service Description</label>
+              <textarea id="svc-desc" class="form-control" placeholder="Provide a brief summary of what this service includes, requirements, or what to bring..." required></textarea>
+            </div>
+
+            <!-- Image Upload -->
+            <div class="form-group">
+              <label class="form-label" for="svc-image-file">Service Cover Image</label>
+              <input type="file" id="svc-image-file" class="form-control" accept="image/*">
+              <input type="hidden" id="svc-image-url">
+              <div id="image-preview-container" style="margin-top: 10px; display: none;">
+                <img id="image-preview" src="" alt="Service Preview" style="max-height: 100px; border-radius: 8px; border: 1px solid var(--border);">
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div style="display:flex; gap:12px; margin-top:30px;">
+              <button type="submit" class="btn btn-primary" id="btn-submit-text" style="flex:2">Add Service Option</button>
+              <a href="dashboard-owner.html" class="btn btn-ghost" style="flex:1">Cancel</a>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    let currentUser = null;
+    let editSvcId = null;
+    let targetBizId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Guard Owner route
+      Auth.requireRole('owner');
+      currentUser = Auth.getCurrentUser();
+
+      // Render Navigation
+      App.renderNav();
+
+      editSvcId = App.getParam('id');
+      targetBizId = App.getParam('bizId');
+
+      if (editSvcId) {
+        setupEditForm();
+      } else {
+        setupCreateForm();
+      }
+
+      // Handle service image preview
+      const imgInput = document.getElementById('svc-image-file');
+      if (imgInput) {
+        imgInput.addEventListener('change', () => {
+          const file = imgInput.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const preview = document.getElementById('image-preview');
+              preview.src = e.target.result;
+              document.getElementById('image-preview-container').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+
+      // Handle Submit
+      const form = document.getElementById('service-form');
+      form.addEventListener('submit', handleFormSubmit);
+    });
+
+    function setupCreateForm() {
+      if (!targetBizId) {
+        window.location.href = 'dashboard-owner.html';
+        return;
+      }
+
+      const biz = Store.getBusinessById(targetBizId);
+      if (!biz || biz.ownerId !== currentUser.id) {
+        window.location.href = 'dashboard-owner.html';
+        return;
+      }
+
+      document.getElementById('target-biz-name').value = biz.name;
+      document.getElementById('target-biz-id').value = biz.id;
+    }
+
+    function setupEditForm() {
+      const svc = Store.getServiceById(editSvcId);
+      if (!svc) {
+        window.location.href = 'dashboard-owner.html';
+        return;
+      }
+
+      const biz = Store.getBusinessById(svc.businessId);
+      if (!biz || biz.ownerId !== currentUser.id) {
+        window.location.href = 'dashboard-owner.html';
+        return;
+      }
+
+      // Adjust Labels
+      document.getElementById('form-title-text').textContent = '✏️ Edit Service Option';
+      document.getElementById('form-subtitle-text').textContent = 'Modify details for this service offering';
+      document.getElementById('btn-submit-text').textContent = 'Save Changes';
+
+      // Info
+      document.getElementById('target-biz-name').value = biz.name;
+      document.getElementById('target-biz-id').value = biz.id;
+
+      // Pre-fill
+      document.getElementById('svc-name').value = svc.name;
+      document.getElementById('svc-price').value = svc.price;
+      document.getElementById('svc-duration').value = svc.duration;
+      document.getElementById('svc-desc').value = svc.description;
+      
+      // Pre-fill image preview
+      if (svc.image) {
+        document.getElementById('svc-image-url').value = svc.image;
+        document.getElementById('image-preview').src = svc.image;
+        document.getElementById('image-preview-container').style.display = 'block';
+      }
+    }
+
+    function uploadFile(fileInputId, callback) {
+      const fileInput = document.getElementById(fileInputId);
+      if (!fileInput || !fileInput.files.length) {
+        callback(null);
+        return;
+      }
+      
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const token = localStorage.getItem('lbm_token');
+      try {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/upload', false); // Synchronous upload
+        if (token) {
+          xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+        }
+        xhr.send(formData);
+        
+        if (xhr.status === 200) {
+          const res = JSON.parse(xhr.responseText);
+          callback(res.url);
+        } else {
+          let errMsg = 'Failed to upload image';
+          try {
+            const errObj = JSON.parse(xhr.responseText);
+            errMsg = errObj.error || errMsg;
+          } catch {}
+          App.showToast(errMsg, 'error');
+          callback(null);
+        }
+      } catch (err) {
+        console.error('Upload connection error:', err);
+        App.showToast('Network error during file upload', 'error');
+        callback(null);
+      }
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+
+      const bizId = document.getElementById('target-biz-id').value;
+      const name = document.getElementById('svc-name').value.trim();
+      const price = parseFloat(document.getElementById('svc-price').value);
+      const duration = document.getElementById('svc-duration').value;
+      const description = document.getElementById('svc-desc').value.trim();
+
+      // Perform upload if file selected
+      let imageUrl = document.getElementById('svc-image-url').value;
+      uploadFile('svc-image-file', (uploadedUrl) => {
+        if (uploadedUrl) {
+          imageUrl = uploadedUrl;
+        }
+      });
+
+      const data = {
+        name, price, duration, description, image: imageUrl
+      };
+
+      if (editSvcId) {
+        // Edit Mode
+        Store.updateService(editSvcId, data);
+        App.showToast('Service option updated successfully!', 'success');
+      } else {
+        // Create Mode
+        Store.createService({
+          businessId: bizId,
+          ...data
+        });
+        App.showToast('Service option added successfully!', 'success');
+      }
+
+      // Redirect back to dashboard (Manage Services tab)
+      setTimeout(() => {
+        window.location.href = 'dashboard-owner.html';
+      }, 1500);
+    }
+  </script>
+</body>
+</html>

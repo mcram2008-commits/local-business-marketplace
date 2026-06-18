@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — LocalBiz Marketplace</title>
+  <meta name="description" content="Login to LocalBiz - Connect with local businesses near you">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+<div class="auth-page">
+  <!-- Left Branding Panel -->
+  <div class="auth-left">
+    <div class="auth-blob auth-blob-1"></div>
+    <div class="auth-blob auth-blob-2"></div>
+    <div class="auth-blob auth-blob-3"></div>
+    <div class="auth-brand">
+      <span class="auth-brand-logo">🏪</span>
+      <div class="auth-brand-name">LocalBiz</div>
+      <div class="auth-brand-tagline">Connecting Local Businesses with Local People</div>
+    </div>
+    <div class="auth-features">
+      <div class="auth-feature">
+        <div class="auth-feature-icon">✓</div>
+        <span>500+ Trusted Local Businesses</span>
+      </div>
+      <div class="auth-feature">
+        <div class="auth-feature-icon">✓</div>
+        <span>Easy Booking & Scheduling</span>
+      </div>
+      <div class="auth-feature">
+        <div class="auth-feature-icon">✓</div>
+        <span>Chat with Business Owners</span>
+      </div>
+      <div class="auth-feature">
+        <div class="auth-feature-icon">✓</div>
+        <span>Verified Ratings & Reviews</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Form Panel -->
+  <div class="auth-right">
+    <div class="auth-card">
+      <h1 class="auth-title">Welcome Back! 👋</h1>
+      <p class="auth-subtitle">Sign in to your LocalBiz account</p>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <div class="input-group">
+            <span class="input-icon">📧</span>
+            <input type="email" id="email" class="form-control" placeholder="Enter your email" autocomplete="email">
+          </div>
+          <div class="form-error" id="email-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-group">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="password" class="form-control" placeholder="Enter your password" autocomplete="current-password">
+            <button type="button" class="pw-toggle" id="pw-toggle">👁</button>
+          </div>
+          <div class="form-error" id="password-error"></div>
+        </div>
+
+        <div class="check-row">
+          <label class="check-label">
+            <input type="checkbox" id="remember"> Remember me
+          </label>
+          <a href="#" class="auth-link" id="forgot-link">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-bottom:16px" id="login-btn">
+          Sign In →
+        </button>
+      </form>
+
+      <div class="auth-divider">or use demo credentials</div>
+
+      <div class="demo-creds">
+        <div class="demo-creds-title">🔑 Quick Login Credentials</div>
+        <div class="demo-cred" data-email="admin@lbm.com" data-pass="admin123">
+          <span class="demo-cred-role">🛡️ Admin</span>
+          <span class="demo-cred-email">admin@lbm.com</span>
+          <span class="demo-cred-pass">admin123</span>
+        </div>
+        <div class="demo-cred" data-email="customer@lbm.com" data-pass="customer123">
+          <span class="demo-cred-role">👤 Customer</span>
+          <span class="demo-cred-email">customer@lbm.com</span>
+          <span class="demo-cred-pass">customer123</span>
+        </div>
+        <div class="demo-cred" data-email="owner@lbm.com" data-pass="owner123">
+          <span class="demo-cred-role">🏪 Business Owner</span>
+          <span class="demo-cred-email">owner@lbm.com</span>
+          <span class="demo-cred-pass">owner123</span>
+        </div>
+      </div>
+
+      <p class="auth-footer-text">
+        Don't have an account? <a href="register.html" class="auth-link">Create Account →</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="js/store.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  Auth.requireGuest();
+
+  // Password toggle
+  document.getElementById('pw-toggle').addEventListener('click', function() {
+    const pw = document.getElementById('password');
+    if (pw.type === 'password') { pw.type = 'text'; this.textContent = '🙈'; }
+    else { pw.type = 'password'; this.textContent = '👁'; }
+  });
+
+  // Forgot password
+  document.getElementById('forgot-link').addEventListener('click', function(e) {
+    e.preventDefault();
+    App.showToast('Password reset feature coming soon!', 'info');
+  });
+
+  // Demo credentials click-to-fill
+  document.querySelectorAll('.demo-cred').forEach(function(el) {
+    el.addEventListener('click', function() {
+      document.getElementById('email').value = this.dataset.email;
+      document.getElementById('password').value = this.dataset.pass;
+      App.showToast('Credentials filled! Click Sign In.', 'info');
+    });
+  });
+
+  // Form submit
+  document.getElementById('login-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    clearErrors();
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    let valid = true;
+
+    if (!email) { showError('email-error', 'Email is required'); valid = false; }
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('email-error', 'Enter a valid email'); valid = false; }
+    if (!password) { showError('password-error', 'Password is required'); valid = false; }
+    if (!valid) return;
+
+    const btn = document.getElementById('login-btn');
+    btn.disabled = true;
+    btn.textContent = 'Signing in...';
+
+    setTimeout(function() {
+      const user = Auth.login(email, password);
+      if (user) {
+        App.showToast('Welcome back, ' + user.name + '! 🎉', 'success');
+        setTimeout(function() { window.location.href = App.getDashboardUrl(); }, 800);
+      } else {
+        App.showToast('Invalid email or password', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Sign In →';
+      }
+    }, 400);
+  });
+
+  function showError(id, msg) {
+    document.getElementById(id).textContent = msg;
+  }
+  function clearErrors() {
+    document.querySelectorAll('.form-error').forEach(function(el) { el.textContent = ''; });
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — LocalBiz Marketplace</title>
+  <meta name="description" content="Create your LocalBiz account - Join thousands of local businesses and customers">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+<div class="auth-page">
+  <!-- Left Panel -->
+  <div class="auth-left">
+    <div class="auth-blob auth-blob-1"></div>
+    <div class="auth-blob auth-blob-2"></div>
+    <div class="auth-blob auth-blob-3"></div>
+    <div class="auth-brand">
+      <span class="auth-brand-logo">🏪</span>
+      <div class="auth-brand-name">LocalBiz</div>
+      <div class="auth-brand-tagline">Connecting Local Businesses with Local People</div>
+    </div>
+    <div class="auth-features">
+      <div class="auth-feature"><div class="auth-feature-icon">✓</div><span>Free Account — No Credit Card</span></div>
+      <div class="auth-feature"><div class="auth-feature-icon">✓</div><span>List Your Business for Free</span></div>
+      <div class="auth-feature"><div class="auth-feature-icon">✓</div><span>Reach Thousands of Customers</span></div>
+      <div class="auth-feature"><div class="auth-feature-icon">✓</div><span>Analytics & Booking Management</span></div>
+    </div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="auth-right">
+    <div class="auth-card">
+      <h1 class="auth-title">Create Account 🚀</h1>
+      <p class="auth-subtitle">Join thousands of local businesses and customers</p>
+
+      <!-- Role Selector -->
+      <div class="role-tabs" id="role-tabs">
+        <button type="button" class="role-tab active" data-role="customer">👤 Customer</button>
+        <button type="button" class="role-tab" data-role="owner">🏪 Business Owner</button>
+      </div>
+
+      <form id="register-form">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <div class="input-group">
+            <span class="input-icon">👤</span>
+            <input type="text" id="reg-name" class="form-control" placeholder="Enter your full name" autocomplete="name">
+          </div>
+          <div class="form-error" id="name-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <div class="input-group">
+            <span class="input-icon">📧</span>
+            <input type="email" id="reg-email" class="form-control" placeholder="Enter your email" autocomplete="email">
+          </div>
+          <div class="form-error" id="reg-email-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <div class="input-group">
+            <span class="input-icon">📱</span>
+            <input type="tel" id="reg-phone" class="form-control" placeholder="Enter your phone number" autocomplete="tel">
+          </div>
+          <div class="form-error" id="phone-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-group">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="reg-password" class="form-control" placeholder="Create a strong password" autocomplete="new-password">
+            <button type="button" class="pw-toggle" id="pw-toggle-1">👁</button>
+          </div>
+          <div class="password-strength">
+            <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+            <div class="strength-label" id="strength-label"></div>
+          </div>
+          <div class="form-error" id="reg-password-error"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <div class="input-group">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="reg-confirm" class="form-control" placeholder="Confirm your password" autocomplete="new-password">
+            <button type="button" class="pw-toggle" id="pw-toggle-2">👁</button>
+          </div>
+          <div class="form-error" id="confirm-error"></div>
+        </div>
+
+        <div class="check-row" style="justify-content:flex-start">
+          <label class="check-label">
+            <input type="checkbox" id="terms">
+            I agree to the <a href="#" class="auth-link" onclick="return false">Terms &amp; Conditions</a>
+          </label>
+        </div>
+        <div class="form-error" id="terms-error"></div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px;margin-bottom:16px" id="reg-btn">
+          Create Account →
+        </button>
+      </form>
+
+      <p class="auth-footer-text">
+        Already have an account? <a href="login.html" class="auth-link">Sign In →</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="js/store.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  Auth.requireGuest();
+
+  let selectedRole = 'customer';
+
+  // Role tab switching
+  document.querySelectorAll('.role-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      selectedRole = this.dataset.role;
+    });
+  });
+
+  // Password toggles
+  function makeToggle(btnId, inputId) {
+    document.getElementById(btnId).addEventListener('click', function() {
+      const inp = document.getElementById(inputId);
+      if (inp.type === 'password') { inp.type = 'text'; this.textContent = '🙈'; }
+      else { inp.type = 'password'; this.textContent = '👁'; }
+    });
+  }
+  makeToggle('pw-toggle-1', 'reg-password');
+  makeToggle('pw-toggle-2', 'reg-confirm');
+
+  // Password strength
+  document.getElementById('reg-password').addEventListener('input', function() {
+    const val = this.value;
+    const fill = document.getElementById('strength-fill');
+    const label = document.getElementById('strength-label');
+    fill.className = 'strength-fill';
+    if (!val) { label.textContent = ''; label.className = 'strength-label'; return; }
+    const hasUpper = /[A-Z]/.test(val);
+    const hasNum = /[0-9]/.test(val);
+    const hasSpec = /[^a-zA-Z0-9]/.test(val);
+    let score = 0;
+    if (val.length >= 6) score++;
+    if (val.length >= 10) score++;
+    if (hasUpper && hasNum) score++;
+    if (hasSpec) score++;
+    if (score <= 1) { fill.classList.add('weak'); label.textContent = 'Weak'; label.className = 'strength-label weak'; }
+    else if (score <= 2) { fill.classList.add('medium'); label.textContent = 'Medium'; label.className = 'strength-label medium'; }
+    else { fill.classList.add('strong'); label.textContent = 'Strong'; label.className = 'strength-label strong'; }
+  });
+
+  function showError(id, msg) { document.getElementById(id).textContent = msg; }
+  function clearErrors() { document.querySelectorAll('.form-error').forEach(el => el.textContent = ''); }
+
+  document.getElementById('register-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    clearErrors();
+    const name = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const phone = document.getElementById('reg-phone').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const confirm = document.getElementById('reg-confirm').value;
+    const terms = document.getElementById('terms').checked;
+    let valid = true;
+
+    if (!name) { showError('name-error', 'Name is required'); valid = false; }
+    if (!email) { showError('reg-email-error', 'Email is required'); valid = false; }
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('reg-email-error', 'Enter a valid email'); valid = false; }
+    else if (Store.getUserByEmail(email)) { showError('reg-email-error', 'Email already registered'); valid = false; }
+    if (!phone) { showError('phone-error', 'Phone is required'); valid = false; }
+    if (!password || password.length < 6) { showError('reg-password-error', 'Password must be at least 6 characters'); valid = false; }
+    if (password !== confirm) { showError('confirm-error', 'Passwords do not match'); valid = false; }
+    if (!terms) { showError('terms-error', 'Please accept the terms & conditions'); valid = false; }
+    if (!valid) return;
+
+    const btn = document.getElementById('reg-btn');
+    btn.disabled = true; btn.textContent = 'Creating account...';
+
+    setTimeout(function() {
+      const user = Store.createUser({ name, email, phone, password, role: selectedRole });
+      Auth.login(email, password);
+      App.showToast('Account created successfully! Welcome, ' + name + ' 🎉', 'success');
+      setTimeout(function() { window.location.href = App.getDashboardUrl(); }, 900);
+    }, 400);
+  });
+});
+</script>
+</body>
+</html>

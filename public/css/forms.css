@@ -1,0 +1,141 @@
+/* ════════════════════════════════════════════════════════════
+   FORMS PAGES — Style Extensions for Business & Service Forms
+   ════════════════════════════════════════════════════════════ */
+
+.form-layout {
+  max-width: 680px;
+  margin: 30px auto 60px;
+}
+
+.form-card {
+  padding: 36px;
+  background: var(--navy-card);
+}
+
+.form-header {
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
+}
+
+.form-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.form-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+/* Custom Image Upload Placeholder */
+.image-upload-wrapper {
+  position: relative;
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+  transition: var(--transition);
+}
+
+.image-upload-wrapper:hover {
+  border-color: var(--teal);
+  background: var(--teal-glow);
+}
+
+.upload-icon {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.upload-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  display: block;
+}
+
+.upload-preview {
+  display: none;
+  max-width: 100%;
+  max-height: 140px;
+  margin-top: 15px;
+  border-radius: var(--radius-xs);
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+
+/* Inline Checkbox Group */
+.form-checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.form-checkbox-group input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--teal);
+}
+
+/* Time slots grid selector */
+.time-grid-picker {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.time-slot-option {
+  padding: 10px 6px;
+  border-radius: var(--radius-xs);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.time-slot-option:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.time-slot-option.selected {
+  background: var(--teal);
+  color: var(--navy);
+  border-color: var(--teal);
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  
+  .form-card {
+    padding: 24px;
+  }
+
+  .time-grid-picker {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LocalBiz — Discover Best Local Businesses Near You</title>
+  <meta name="description" content="Find and book trusted local businesses. Restaurants, salons, home services, gyms and more near you.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/home.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav id="main-nav"></nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="glow-orb" style="top: 10%; left: 5%;"></div>
+    <div class="glow-orb" style="bottom: 10%; right: 10%; animation-delay: -4s;"></div>
+    <div class="container hero-inner">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          Discover Best <span class="gradient-text">Local Businesses</span> Near You
+        </h1>
+        <p class="hero-subtitle">
+          Find trusted local businesses and services around you. Support local community growth, enjoy premium services, and book appointments instantly.
+        </p>
+
+        <!-- Search Bar -->
+        <form id="hero-search-form" class="search-container">
+          <div class="search-field text-search">
+            <span class="field-icon">🔍</span>
+            <input type="text" id="search-query" placeholder="Search for businesses or services..." aria-label="Search query">
+          </div>
+          <div class="search-divider"></div>
+          <div class="search-field">
+            <span class="field-icon">📍</span>
+            <select id="search-city" aria-label="Select City">
+              <option value="">All Cities</option>
+              <option value="Chennai">Chennai</option>
+              <option value="Mumbai">Mumbai</option>
+              <option value="Delhi">Delhi</option>
+              <option value="Bangalore">Bangalore</option>
+              <option value="Hyderabad">Hyderabad</option>
+            </select>
+          </div>
+          <div class="search-divider"></div>
+          <div class="search-field">
+            <span class="field-icon">🏪</span>
+            <select id="search-category" aria-label="Select Category">
+              <option value="">All Categories</option>
+              <option value="Restaurants">Restaurants</option>
+              <option value="Beauty & Spa">Beauty & Spa</option>
+              <option value="Home Services">Home Services</option>
+              <option value="Fitness">Fitness</option>
+              <option value="Education">Education</option>
+              <option value="Healthcare">Healthcare</option>
+              <option value="Automotive">Automotive</option>
+              <option value="Travel">Travel</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+
+        <!-- Stats Pills -->
+        <div class="hero-stats">
+          <div class="hero-stat-pill">500+ Businesses ★</div>
+          <div class="hero-stat-pill">10K+ Customers ♥</div>
+          <div class="hero-stat-pill">50+ Cities 📍</div>
+        </div>
+      </div>
+
+      <!-- Right Visual -->
+      <div class="hero-visual">
+        <div class="collage-grid">
+          <div class="collage-item" title="Restaurants" onclick="window.location.href='businesses.html?category=Restaurants'">🍽️</div>
+          <div class="collage-item" title="Beauty & Spa" onclick="window.location.href='businesses.html?category=Beauty%20%26%20Spa'">💆</div>
+          <div class="collage-item" title="Home Services" onclick="window.location.href='businesses.html?category=Home%20Services'">🔧</div>
+          <div class="collage-item" title="Fitness" onclick="window.location.href='businesses.html?category=Fitness'">💪</div>
+          <div class="collage-item" title="Healthcare" onclick="window.location.href='businesses.html?category=Healthcare'">🏥</div>
+          <div class="collage-item" title="Education" onclick="window.location.href='businesses.html?category=Education'">📚</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Categories Section -->
+  <section class="categories-section">
+    <div class="container">
+      <h2 class="section-title">Explore by Category</h2>
+      <p class="section-subtitle">Find local businesses sorted by popular categories</p>
+      
+      <div class="categories-container">
+        <div class="category-card" onclick="window.location.href='businesses.html?category=Restaurants'">
+          <span class="category-emoji">🍽️</span>
+          <div class="category-name">Restaurants</div>
+        </div>
+        <div class="category-card" onclick="window.location.href='businesses.html?category=Beauty%20%26%20Spa'">
+          <span class="category-emoji">💆</span>
+          <div class="category-name">Beauty & Spa</div>
+        </div>
+        <div class="category-card" onclick="window.location.href='businesses.html?category=Home%20Services'">
+          <span class="category-emoji">🔧</span>
+          <div class="category-name">Home Services</div>
+        </div>
+        <div class="category-card" onclick="window.location.href='businesses.html?category=Fitness'">
+          <span class="category-emoji">💪</span>
+          <div class="category-name">Fitness</div>
+        </div>
+        <div class="category-card" onclick="window.location.href='businesses.html?category=Education'">
+          <span class="category-emoji">📚</span>
+          <div class="category-name">Education</div>
+        </div>
+        <div class="category-card" onclick="window.location.href='businesses.html?category=Healthcare'">
+          <span class="category-emoji">🏥</span>
+          <div class="category-name">Healthcare</div>
+        </div>
+        <div class="category-card" onclick="window.location.href='businesses.html?category=Automotive'">
+          <span class="category-emoji">🚗</span>
+          <div class="category-name">Automotive</div>
+        </div>
+        <div class="category-card" onclick="window.location.href='businesses.html?category=Travel'">
+          <span class="category-emoji">✈️</span>
+          <div class="category-name">Travel</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Businesses Section -->
+  <section class="featured-section">
+    <div class="container">
+      <div class="featured-header">
+        <div class="section-title-wrapper">
+          <h2 class="section-title">Featured Businesses</h2>
+          <p class="section-subtitle" style="margin-bottom:0">Handpicked local services highly rated by customers</p>
+        </div>
+        <a href="businesses.html" class="btn btn-outline">View All Businesses →</a>
+      </div>
+      
+      <div id="featured-grid" class="business-grid" style="margin-top: 40px;">
+        <!-- Dynamically rendered -->
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 50px;">
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-subtitle">Get things done in 4 simple steps</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="steps-line"></div>
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <div class="step-icon">📝</div>
+          <h3 class="step-title">Register</h3>
+          <p class="step-desc">Create your free account as a Customer or a Business Owner</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <div class="step-icon">🔍</div>
+          <h3 class="step-title">Search</h3>
+          <p class="step-desc">Find trusted businesses by name, location, or service category</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <div class="step-icon">📅</div>
+          <h3 class="step-title">Book</h3>
+          <p class="step-desc">Schedule appointments and book services with instant confirmation</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <div class="step-icon">⭐</div>
+          <h3 class="step-title">Review</h3>
+          <p class="step-desc">Share your rating and feedback to support local growth</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Counter Section -->
+  <section class="stats-section">
+    <div class="container stats-grid">
+      <div class="stat-item">
+        <div class="stat-number stat-counter" data-target="500">0</div>
+        <div class="stat-label">Verified Businesses</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number stat-counter" data-target="10000">0</div>
+        <div class="stat-label">Happy Customers</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number stat-counter" data-target="50">0</div>
+        <div class="stat-label">Service Categories</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number stat-counter" data-target="25">0</div>
+        <div class="stat-label">Cities Reached</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="testimonials-section">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 50px;">
+        <h2 class="section-title">What Our Customers Say</h2>
+        <p class="section-subtitle">Real experiences from real local community members</p>
+      </div>
+
+      <div class="testimonials-grid">
+        <div class="card testimonial-card">
+          <div class="testimonial-user">
+            <div class="testimonial-avatar">AR</div>
+            <div class="testimonial-info">
+              <h4>Ananya R.</h4>
+              <div class="testimonial-biz">Glow Beauty Spa</div>
+            </div>
+          </div>
+          <div class="stars" style="margin-bottom: 12px;">★★★★★</div>
+          <p class="testimonial-comment">
+            "The online booking was super easy and I got immediate confirmation. The service at Glow Beauty Spa was fantastic. My new favorite platform!"
+          </p>
+        </div>
+
+        <div class="card testimonial-card">
+          <div class="testimonial-user">
+            <div class="testimonial-avatar">VS</div>
+            <div class="testimonial-info">
+              <h4>Vikram S.</h4>
+              <div class="testimonial-biz">Ram Fitness Gym</div>
+            </div>
+          </div>
+          <div class="stars" style="margin-bottom: 12px;">★★★★★</div>
+          <p class="testimonial-comment">
+            "Direct chat with gym owner helped clarify trainer schedules before registering. I've been working out here for 3 months now. Absolutely excellent!"
+          </p>
+        </div>
+
+        <div class="card testimonial-card">
+          <div class="testimonial-user">
+            <div class="testimonial-avatar">MK</div>
+            <div class="testimonial-info">
+              <h4>Meera K.</h4>
+              <div class="testimonial-biz">QuickFix Services</div>
+            </div>
+          </div>
+          <div class="stars" style="margin-bottom: 12px;">★★★★☆</div>
+          <p class="testimonial-comment">
+            "Needed a plumber urgently on a Sunday. QuickFix Home Services responded within 20 minutes of booking. Very reliable local service platform."
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="footer-logo">🏪 LocalBiz</a>
+        <p>Connecting trust-based local services with immediate customer needs. Empowering local economies everywhere.</p>
+      </div>
+      <div>
+        <h4 class="footer-title">For Customers</h4>
+        <ul class="footer-links">
+          <li><a href="businesses.html">Browse Businesses</a></li>
+          <li><a href="register.html">Create Account</a></li>
+          <li><a href="login.html">Login</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="footer-title">For Business Owners</h4>
+        <ul class="footer-links">
+          <li><a href="register.html">Register Business</a></li>
+          <li><a href="login.html">Merchant Portal</a></li>
+          <li><a href="index.html">Success Stories</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="footer-title">Follow Us</h4>
+        <div class="social-links" style="margin-bottom: 20px;">
+          <a href="#" class="social-icon">🔵</a>
+          <a href="#" class="social-icon">📸</a>
+          <a href="#" class="social-icon">🐦</a>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-secondary);">Contact: support@localbiz.com</p>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <div>&copy; 2026 LocalBiz Marketplace. All rights reserved.</div>
+      <div>Made with ❤️ for local growth</div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>
