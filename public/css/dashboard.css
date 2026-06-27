@@ -258,7 +258,7 @@
 }
 
 .data-table tr:hover td {
-  background: rgba(255, 255, 255, 0.01);
+  background: var(--navy-hover);
 }
 
 /* User Profile & Details in tables */

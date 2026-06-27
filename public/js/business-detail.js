@@ -62,7 +62,7 @@ function renderHero() {
   const ownerName = ownerUser ? ownerUser.name : 'Unknown';
 
   if (business.logo) {
-    heroEl.style.background = `linear-gradient(rgba(10, 15, 30, 0.75), rgba(10, 15, 30, 0.85)), url('${business.logo}')`;
+    heroEl.style.background = `linear-gradient(rgba(5, 6, 15, 0.5), rgba(5, 6, 15, 0.92)), url('${business.logo}')`;
     heroEl.style.backgroundSize = 'cover';
     heroEl.style.backgroundPosition = 'center';
   } else {
@@ -77,7 +77,7 @@ function renderHero() {
           ${verifiedBadge}
         </div>
         <div class="detail-hero-meta">
-          <span class="tag">${App.getCategoryIcon(business.category)} ${business.category}</span>
+          <span class="tag"><span class="tag-svg-wrapper">${App.getCategorySvg(business.category)}</span> ${business.category}</span>
           <span><span class="stars">${ratingStars}</span> <strong>${business.rating}</strong> (${business.reviewCount || 0} reviews)</span>
           <span>📍 ${business.address}, ${business.city}</span>
           <span>📞 ${business.phone}</span>
@@ -221,11 +221,11 @@ function renderServices() {
     <div class="service-grid">
       ${services.map(svc => {
         const coverColor = App.getCategoryColor(business.category);
-        const coverIcon = App.getCategoryIcon(business.category);
+        const coverIcon = App.getCategorySvg(business.category);
         const coverStyle = svc.image 
           ? `background-image: url('${svc.image}'); background-size: cover; background-position: center;`
           : `background: ${coverColor}`;
-        const coverContent = svc.image ? '' : coverIcon;
+        const coverContent = svc.image ? '' : `<div class="card-cover-svg-wrapper">${coverIcon}</div>`;
 
         return `
           <div class="service-card">
@@ -351,32 +351,32 @@ function renderPhotos() {
   if (!panel) return;
 
   const bgGrad = App.getCategoryColor(business.category);
-  const icon = App.getCategoryIcon(business.category);
+  const icon = App.getCategorySvg(business.category);
 
   panel.innerHTML = `
     <div class="photos-grid">
       <div class="photo-placeholder" style="background: ${bgGrad}1a">
-        <span>${icon}</span>
+        <span class="card-cover-svg-wrapper">${icon}</span>
         <div class="photo-label">Main Entrance</div>
       </div>
       <div class="photo-placeholder" style="background: ${bgGrad}1a">
-        <span>🏪</span>
+        <span class="photo-placeholder-icon">🏪</span>
         <div class="photo-label">Reception Desk</div>
       </div>
       <div class="photo-placeholder" style="background: ${bgGrad}1a">
-        <span>💆</span>
+        <span class="photo-placeholder-icon">💆</span>
         <div class="photo-label">Service Lounge</div>
       </div>
       <div class="photo-placeholder" style="background: ${bgGrad}1a">
-        <span>🔧</span>
+        <span class="photo-placeholder-icon">🔧</span>
         <div class="photo-label">Equipment Area</div>
       </div>
       <div class="photo-placeholder" style="background: ${bgGrad}1a">
-        <span>💼</span>
+        <span class="photo-placeholder-icon">💼</span>
         <div class="photo-label">Staff Workspace</div>
       </div>
       <div class="photo-placeholder" style="background: ${bgGrad}1a">
-        <span>✨</span>
+        <span class="photo-placeholder-icon">✨</span>
         <div class="photo-label">Premium Zone</div>
       </div>
     </div>

@@ -65,17 +65,32 @@ window.App = (function () {
     return icons[category] || '🏪';
   }
 
+  function getCategorySvg(category) {
+    const svgs = {
+      'Restaurants': `<svg class="cat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M18 5v10a3 3 0 0 1-6 0V5M6 5v6a2 2 0 0 0 4 0V5"/></svg>`,
+      'Beauty & Spa': `<svg class="cat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8"/></svg>`,
+      'Home Services': `<svg class="cat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`,
+      'Fitness': `<svg class="cat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7.5h12M6 16.5h12M4 5v14M20 5v14M1 9v6M23 9v6"/></svg>`,
+      'Education': `<svg class="cat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5v-15z"/></svg>`,
+      'Healthcare': `<svg class="cat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>`,
+      'Automotive': `<svg class="cat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 1 13v3c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>`,
+      'Travel': `<svg class="cat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5c.8-.8.8-2 0-2.8s-2-.8-2.8 0L13 8.2l-8.2-1.8c-.5-.1-1 .1-1.3.5-.4.4-.4 1 0 1.4l5.8 4.2-3.5 3.5-2.1-.7c-.3-.1-.6 0-.8.2L1.8 17l2.8 1.4 1.4 2.8 1.3-1.3c.2-.2.3-.5.2-.8l-.7-2.1 3.5-3.5 4.2 5.8c.4.4 1 .4 1.4 0 .4-.3.6-.8.5-1.3z"/></svg>`,
+      'Other': `<svg class="cat-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>`
+    };
+    return svgs[category] || svgs['Other'];
+  }
+
   function getCategoryColor(category) {
     const colors = {
-      'Restaurants': 'linear-gradient(135deg, #f093fb, #f5576c)',
-      'Beauty & Spa': 'linear-gradient(135deg, #fa709a, #fee140)',
-      'Home Services': 'linear-gradient(135deg, #4facfe, #00f2fe)',
-      'Fitness': 'linear-gradient(135deg, #43e97b, #38f9d7)',
-      'Education': 'linear-gradient(135deg, #a18cd1, #fbc2eb)',
-      'Healthcare': 'linear-gradient(135deg, #84fab0, #8fd3f4)',
-      'Automotive': 'linear-gradient(135deg, #ffecd2, #fcb69f)',
-      'Travel': 'linear-gradient(135deg, #a1c4fd, #c2e9fb)',
-      'Other': 'linear-gradient(135deg, #00d4aa, #00a884)'
+      'Restaurants': 'linear-gradient(135deg, rgba(240, 147, 251, 0.25), rgba(245, 87, 108, 0.25))',
+      'Beauty & Spa': 'linear-gradient(135deg, rgba(250, 112, 154, 0.25), rgba(254, 225, 64, 0.25))',
+      'Home Services': 'linear-gradient(135deg, rgba(79, 172, 254, 0.25), rgba(0, 242, 254, 0.25))',
+      'Fitness': 'linear-gradient(135deg, rgba(67, 233, 123, 0.25), rgba(56, 249, 215, 0.25))',
+      'Education': 'linear-gradient(135deg, rgba(161, 140, 209, 0.25), rgba(251, 194, 235, 0.25))',
+      'Healthcare': 'linear-gradient(135deg, rgba(132, 250, 176, 0.25), rgba(143, 211, 244, 0.25))',
+      'Automotive': 'linear-gradient(135deg, rgba(255, 236, 210, 0.25), rgba(252, 182, 159, 0.25))',
+      'Travel': 'linear-gradient(135deg, rgba(161, 196, 253, 0.25), rgba(194, 233, 251, 0.25))',
+      'Other': 'linear-gradient(135deg, rgba(0, 242, 254, 0.25), rgba(0, 198, 255, 0.25))'
     };
     return colors[category] || colors['Other'];
   }
@@ -174,7 +189,7 @@ window.App = (function () {
 
   return {
     formatCurrency, formatDate, formatDateTime, getInitials, generateId,
-    getParam, getDashboardUrl, renderStars, getCategoryIcon, getCategoryColor,
+    getParam, getDashboardUrl, renderStars, getCategoryIcon, getCategorySvg, getCategoryColor,
     timeAgo, showToast, renderNav
   };
 })();

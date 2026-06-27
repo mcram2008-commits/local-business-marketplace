@@ -145,22 +145,30 @@
 .collage-item {
   width: 90px;
   height: 90px;
-  border-radius: 50%;
+  border-radius: var(--radius);
   background: var(--navy-card);
   border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.2rem;
   box-shadow: var(--shadow);
   transition: var(--transition);
   cursor: pointer;
+  padding: 24px;
+  color: var(--teal);
+}
+
+.collage-item svg {
+  width: 100%;
+  height: 100%;
 }
 
 .collage-item:hover {
-  transform: scale(1.1) rotate(5deg);
+  transform: scale(1.1) rotate(5deg) translateY(-5px);
   border-color: var(--teal);
   box-shadow: var(--shadow-teal);
+  background: var(--teal);
+  color: #05060f;
 }
 
 .collage-item:nth-child(even) {
@@ -168,7 +176,11 @@
 }
 
 .collage-item:nth-child(even):hover {
-  transform: translateY(15px) scale(1.1) rotate(-5deg);
+  transform: translateY(10px) scale(1.1) rotate(-5deg);
+  border-color: var(--teal);
+  box-shadow: var(--shadow-teal);
+  background: var(--teal);
+  color: #05060f;
 }
 
 .glow-orb {
@@ -217,15 +229,32 @@
   box-shadow: var(--shadow-teal);
 }
 
-.category-emoji {
-  font-size: 2.8rem;
-  margin-bottom: 12px;
-  display: inline-block;
+.category-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--glass-hover);
+  color: var(--teal);
+  margin-bottom: 16px;
   transition: var(--transition);
+  padding: 14px;
+  border: 1px solid var(--border);
 }
 
-.category-card:hover .category-emoji {
-  transform: scale(1.15);
+.category-icon-wrapper svg {
+  width: 100%;
+  height: 100%;
+  stroke-width: 2px;
+}
+
+.category-card:hover .category-icon-wrapper {
+  background: var(--teal);
+  color: #05060f;
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
 }
 
 .category-name {

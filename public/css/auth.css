@@ -10,7 +10,7 @@
 /* ── Left Branding Panel ────────────────────────────────── */
 .auth-left {
   flex: 0 0 45%;
-  background: linear-gradient(135deg, #051128 0%, #0a1e3d 40%, #003d2e 100%);
+  background: linear-gradient(135deg, #05060f 0%, #0c0d21 40%, #1e113a 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -23,13 +23,20 @@
 .auth-blob {
   position: absolute;
   border-radius: 50%;
-  background: rgba(0, 212, 170, 0.07);
-  animation: float 4s ease-in-out infinite;
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.1) 0%, transparent 70%);
+  filter: blur(40px);
+  animation: float-blob 10s ease-in-out infinite alternate;
   pointer-events: none;
 }
 .auth-blob-1 { width: 300px; height: 300px; top: -80px; right: -80px; animation-delay: 0s; }
-.auth-blob-2 { width: 200px; height: 200px; bottom: 60px; left: -60px; animation-delay: 1.5s; background: rgba(255,215,0,0.05); }
-.auth-blob-3 { width: 120px; height: 120px; top: 50%; left: 30%; animation-delay: 3s; }
+.auth-blob-2 { width: 200px; height: 200px; bottom: 60px; left: -60px; animation-delay: -3s; background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%); }
+.auth-blob-3 { width: 120px; height: 120px; top: 50%; left: 30%; animation-delay: -6s; }
+
+@keyframes float-blob {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(25px, -35px) scale(1.1); }
+  100% { transform: translate(-15px, 20px) scale(0.95); }
+}
 
 .auth-brand {
   position: relative;

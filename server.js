@@ -1,9 +1,8 @@
 /**
- * Local Business Marketplace - Express & SQLite Full-Stack Backend Server
+ * Local Business Marketplace - Express & Firebase Full-Stack Backend Server
  */
 const express = require('express');
 const cors = require('cors');
-const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const path = require('path');
@@ -27,219 +26,13 @@ if (!fs.existsSync(uploadDir)) {
 }
 app.use('/uploads', express.static(uploadDir));
 
-// Database Connection
-const db = new sqlite3.Database(path.join(__dirname, 'database.sqlite'), (err) => {
-  if (err) {
-    console.error('Error opening SQLite database:', err.message);
-  } else {
-    console.log('Connected to SQLite database.');
-    initializeDatabase();
-  }
+const db = require('./firestore-db');
+
+// Trigger initial seeding check
+db.seed().catch(err => {
+  console.error("Firebase database operation failed:", err.message);
+  console.warn("Please ensure you have enabled 'Firestore Database' in your Firebase console for project 'local-area-service'!");
 });
-
-// Helper DB Promise wrappers
-const dbRun = (sql, params = []) => new Promise((resolve, reject) => {
-  db.run(sql, params, function (err) {
-    if (err) reject(err);
-    else resolve(this);
-  });
-});
-
-const dbAll = (sql, params = []) => new Promise((resolve, reject) => {
-  db.all(sql, params, (err, rows) => {
-    if (err) reject(err);
-    else resolve(rows);
-  });
-});
-
-const dbGet = (sql, params = []) => new Promise((resolve, reject) => {
-  db.get(sql, params, (err, row) => {
-    if (err) reject(err);
-    else resolve(row);
-  });
-});
-
-// Initialize Tables & Seed Data
-async function initializeDatabase() {
-  try {
-    // 1. Users Table
-    await dbRun(`CREATE TABLE IF NOT EXISTS users (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL,
-      role TEXT NOT NULL,
-      phone TEXT,
-      createdAt TEXT NOT NULL
-    )`);
-
-    // 2. Businesses Table
-    await dbRun(`CREATE TABLE IF NOT EXISTS businesses (
-      id TEXT PRIMARY KEY,
-      ownerId TEXT NOT NULL,
-      name TEXT NOT NULL,
-      category TEXT NOT NULL,
-      address TEXT NOT NULL,
-      city TEXT NOT NULL,
-      state TEXT NOT NULL,
-      phone TEXT NOT NULL,
-      email TEXT NOT NULL,
-      description TEXT NOT NULL,
-      openTime TEXT NOT NULL,
-      closeTime TEXT NOT NULL,
-      logo TEXT,
-      isVerified INTEGER DEFAULT 0,
-      rating REAL DEFAULT 0,
-      reviewCount INTEGER DEFAULT 0,
-      createdAt TEXT NOT NULL,
-      FOREIGN KEY(ownerId) REFERENCES users(id) ON DELETE CASCADE
-    )`);
-
-    // 3. Services Table
-    await dbRun(`CREATE TABLE IF NOT EXISTS services (
-      id TEXT PRIMARY KEY,
-      businessId TEXT NOT NULL,
-      name TEXT NOT NULL,
-      description TEXT NOT NULL,
-      price REAL NOT NULL,
-      duration TEXT NOT NULL,
-      image TEXT,
-      createdAt TEXT NOT NULL,
-      FOREIGN KEY(businessId) REFERENCES businesses(id) ON DELETE CASCADE
-    )`);
-
-    // 4. Bookings Table
-    await dbRun(`CREATE TABLE IF NOT EXISTS bookings (
-      id TEXT PRIMARY KEY,
-      userId TEXT NOT NULL,
-      businessId TEXT NOT NULL,
-      serviceId TEXT NOT NULL,
-      bookingDate TEXT NOT NULL,
-      time TEXT NOT NULL,
-      status TEXT DEFAULT 'pending',
-      totalAmount REAL NOT NULL,
-      createdAt TEXT NOT NULL,
-      FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE,
-      FOREIGN KEY(businessId) REFERENCES businesses(id) ON DELETE CASCADE,
-      FOREIGN KEY(serviceId) REFERENCES services(id) ON DELETE CASCADE
-    )`);
-
-    // 5. Reviews Table
-    await dbRun(`CREATE TABLE IF NOT EXISTS reviews (
-      id TEXT PRIMARY KEY,
-      userId TEXT NOT NULL,
-      businessId TEXT NOT NULL,
-      rating INTEGER NOT NULL,
-      comment TEXT NOT NULL,
-      createdAt TEXT NOT NULL,
-      FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE,
-      FOREIGN KEY(businessId) REFERENCES businesses(id) ON DELETE CASCADE
-    )`);
-
-    // 6. Chats Table
-    await dbRun(`CREATE TABLE IF NOT EXISTS chats (
-      id TEXT PRIMARY KEY,
-      senderId TEXT NOT NULL,
-      receiverId TEXT NOT NULL,
-      businessId TEXT NOT NULL,
-      message TEXT NOT NULL,
-      time TEXT NOT NULL,
-      createdAt TEXT NOT NULL,
-      FOREIGN KEY(senderId) REFERENCES users(id),
-      FOREIGN KEY(receiverId) REFERENCES users(id),
-      FOREIGN KEY(businessId) REFERENCES businesses(id) ON DELETE CASCADE
-    )`);
-
-    // Seed data if users table is empty
-    const usersCount = await dbGet(`SELECT count(*) as count FROM users`);
-    if (usersCount.count === 0) {
-      console.log('Seeding SQLite Database with initial marketplace records...');
-      await seedDatabase();
-    }
-
-  } catch (error) {
-    console.error('Database initialization failed:', error.message);
-  }
-}
-
-async function seedDatabase() {
-  try {
-    // 1. Hash Seed Passwords
-    const hashAdmin = bcrypt.hashSync('admin123', 10);
-    const hashCust = bcrypt.hashSync('customer123', 10);
-    const hashOwner = bcrypt.hashSync('owner123', 10);
-
-    const users = [
-      ['u_admin', 'Admin User', 'admin@lbm.com', hashAdmin, 'admin', '9000000000', '2024-01-01T00:00:00Z'],
-      ['u_cust1', 'Priya Sharma', 'customer@lbm.com', hashCust, 'customer', '9876543210', '2024-02-15T00:00:00Z'],
-      ['u_cust2', 'Rahul Verma', 'customer2@lbm.com', hashCust, 'customer', '9876500000', '2024-03-10T00:00:00Z'],
-      ['u_own1', 'Ram Kumar', 'owner@lbm.com', hashOwner, 'owner', '9812345678', '2024-01-20T00:00:00Z'],
-      ['u_own2', 'Sneha Patel', 'owner2@lbm.com', hashOwner, 'owner', '9823456789', '2024-02-05T00:00:00Z']
-    ];
-
-    const businesses = [
-      ['b001', 'u_own1', 'Ram Fitness Gym', 'Fitness', '12 Anna Salai, Chennai', 'Chennai', 'Tamil Nadu', '9812345678', 'owner@lbm.com', 'Best gym in town with modern equipment and certified trainers. We offer personal training, group classes, and nutrition counseling.', '06:00', '22:00', '', 1, 4.7, 48, '2024-01-20T00:00:00Z'],
-      ['b002', 'u_own2', 'Glow Beauty Spa', 'Beauty & Spa', '45 Linking Road, Bandra', 'Mumbai', 'Maharashtra', '9823456789', 'owner2@lbm.com', 'Premium beauty salon and spa offering facials, hair treatments, massages, and bridal packages. Relax and rejuvenate in our luxury setting.', '09:00', '20:00', '', 1, 4.5, 32, '2024-02-05T00:00:00Z'],
-      ['b003', 'u_own1', 'QuickFix Home Services', 'Home Services', '7 Connaught Place', 'Delhi', 'Delhi NCR', '9845678901', 'owner@lbm.com', 'Professional home repair and maintenance services. Plumbing, electrical, carpentry, painting, and more. Quick response, quality work guaranteed.', '08:00', '19:00', '', 0, 4.2, 21, '2024-03-01T00:00:00Z']
-    ];
-
-    const services = [
-      ['s001', 'b001', 'Personal Training', '1-on-1 training session with certified trainer tailored to your fitness goals.', 2000, '1 hour', '', '2024-01-21T00:00:00Z'],
-      ['s002', 'b001', 'Monthly Membership', 'Unlimited gym access for a full month. All equipment included.', 1500, 'Monthly', '', '2024-01-21T00:00:00Z'],
-      ['s003', 'b001', 'Diet Consultation', 'Personalized diet plan from our certified nutritionist.', 800, '45 min', '', '2024-01-22T00:00:00Z'],
-      ['s004', 'b002', 'Full Body Massage', 'Relaxing full body Swedish massage to relieve stress and tension.', 1800, '1 hour', '', '2024-02-06T00:00:00Z'],
-      ['s005', 'b002', 'Bridal Package', 'Complete bridal beauty package including makeup, hair, and skincare.', 12000, 'Half day', '', '2024-02-06T00:00:00Z'],
-      ['s006', 'b002', 'Facial Treatment', 'Deep cleansing facial with premium organic products.', 1200, '1 hour', '', '2024-02-07T00:00:00Z'],
-      ['s007', 'b003', 'Plumbing Repair', 'Fix leaks, blocked drains, pipe repairs and installation.', 500, '1-2 hours', '', '2024-03-02T00:00:00Z'],
-      ['s008', 'b003', 'Electrical Work', 'Wiring, switches, fan installation, and all electrical repairs.', 700, '1-3 hours', '', '2024-03-02T00:00:00Z']
-    ];
-
-    const bookings = [
-      ['bk001', 'u_cust1', 'b001', 's001', '2026-07-01', '10:00 AM', 'confirmed', 2000, '2024-06-25T00:00:00Z'],
-      ['bk002', 'u_cust1', 'b001', 's002', '2026-07-01', '06:00 AM', 'pending', 1500, '2024-06-26T00:00:00Z'],
-      ['bk003', 'u_cust2', 'b002', 's004', '2026-06-20', '02:00 PM', 'completed', 1800, '2024-06-15T00:00:00Z'],
-      ['bk004', 'u_cust1', 'b002', 's006', '2026-06-15', '11:00 AM', 'completed', 1200, '2024-06-10T00:00:00Z'],
-      ['bk005', 'u_cust2', 'b003', 's007', '2026-07-05', '09:00 AM', 'pending', 500, '2024-06-28T00:00:00Z']
-    ];
-
-    const reviews = [
-      ['r001', 'u_cust1', 'b001', 5, 'Amazing gym! The trainers are very professional and the equipment is top-notch. Highly recommend!', '2024-06-20T00:00:00Z'],
-      ['r002', 'u_cust2', 'b002', 4, 'Lovely spa experience. Very relaxing and professional staff. Will definitely come back!', '2024-06-21T00:00:00Z'],
-      ['r003', 'u_cust1', 'b002', 5, 'Best facial I have ever had. My skin feels amazing!', '2024-06-17T00:00:00Z']
-    ];
-
-    const chats = [
-      ['c001', 'u_cust1', 'u_own1', 'b001', 'Hi, I want to know about personal training sessions.', '2024-06-25T10:30:00Z', '2024-06-25T10:30:00Z'],
-      ['c002', 'u_own1', 'u_cust1', 'b001', 'Sure! Please let me know your fitness goals and preferred time slots.', '2024-06-25T10:32:00Z', '2024-06-25T10:32:00Z'],
-      ['c003', 'u_cust1', 'u_own1', 'b001', 'I want to lose weight and build muscle. Morning slots preferred.', '2024-06-25T10:35:00Z', '2024-06-25T10:35:00Z'],
-      ['c004', 'u_own1', 'u_cust1', 'b001', 'Great! We have 6 AM and 7 AM slots available. Book online or visit us directly.', '2024-06-25T10:37:00Z', '2024-06-25T10:37:00Z']
-    ];
-
-    // Bulk Seed inserts
-    for (const u of users) {
-      await dbRun(`INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?)`, u);
-    }
-    for (const b of businesses) {
-      await dbRun(`INSERT INTO businesses VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, b);
-    }
-    for (const s of services) {
-      await dbRun(`INSERT INTO services VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, s);
-    }
-    for (const bk of bookings) {
-      await dbRun(`INSERT INTO bookings VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, bk);
-    }
-    for (const r of reviews) {
-      await dbRun(`INSERT INTO reviews VALUES (?, ?, ?, ?, ?, ?)`, r);
-    }
-    for (const c of chats) {
-      await dbRun(`INSERT INTO chats VALUES (?, ?, ?, ?, ?, ?, ?)`, c);
-    }
-
-    console.log('Database seeding successfully finished.');
-  } catch (err) {
-    console.error('Error seeding data:', err.message);
-  }
-}
 
 /* ─── AUTHENTICATION MIDDLEWARE ──────────────────────────────────── */
 function authenticateToken(req, res, next) {
@@ -281,7 +74,7 @@ app.post('/api/auth/register', async (req, res) => {
   }
 
   try {
-    const existingUser = await dbGet(`SELECT * FROM users WHERE email = ?`, [email]);
+    const existingUser = await db.users.getByEmail(email);
     if (existingUser) {
       return res.status(400).json({ error: 'Email address already registered' });
     }
@@ -290,8 +83,15 @@ app.post('/api/auth/register', async (req, res) => {
     const userId = 'u_' + Date.now() + Math.random().toString(36).substr(2, 5);
     const createdAt = new Date().toISOString();
 
-    await dbRun(`INSERT INTO users (id, name, email, password, role, phone, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [userId, name, email, hashedPassword, role, phone, createdAt]);
+    await db.users.create({
+      id: userId,
+      name,
+      email,
+      password: hashedPassword,
+      role,
+      phone: phone || '',
+      createdAt
+    });
 
     // Return created details without password
     res.status(201).json({
@@ -315,7 +115,7 @@ app.post('/api/auth/login', async (req, res) => {
   }
 
   try {
-    const user = await dbGet(`SELECT * FROM users WHERE email = ?`, [email]);
+    const user = await db.users.getByEmail(email);
     if (!user || !bcrypt.compareSync(password, user.password)) {
       return res.status(400).json({ error: 'Invalid email or password credentials' });
     }
@@ -341,10 +141,11 @@ app.post('/api/auth/login', async (req, res) => {
 // GET /api/auth/me
 app.get('/api/auth/me', authenticateToken, async (req, res) => {
   try {
-    const user = await dbGet(`SELECT id, name, email, role, phone, createdAt FROM users WHERE id = ?`, [req.user.id]);
+    const user = await db.users.getById(req.user.id);
     if (!user) {
       return res.status(404).json({ error: 'User profile not found' });
     }
+    delete user.password;
     res.json(user);
   } catch (err) {
     res.status(500).json({ error: 'Server profile retrieval error' });
@@ -354,8 +155,12 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
 // GET /api/users (Retrieve user list profiles, excluding passwords)
 app.get('/api/users', async (req, res) => {
   try {
-    const list = await dbAll(`SELECT id, name, email, role, phone, createdAt FROM users`);
-    res.json(list);
+    const list = await db.users.getAll();
+    const sanitised = list.map(u => {
+      delete u.password;
+      return u;
+    });
+    res.json(sanitised);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch user profiles list' });
   }
@@ -402,36 +207,15 @@ app.post('/api/upload', authenticateToken, (req, res) => {
 // GET /api/businesses (With search & filter queries)
 app.get('/api/businesses', async (req, res) => {
   const { search, category, city, verified, ownerId } = req.query;
-  let sql = `SELECT * FROM businesses WHERE 1=1`;
-  const params = [];
-
-  if (search) {
-    sql += ` AND (name LIKE ? OR description LIKE ? OR category LIKE ? OR city LIKE ?)`;
-    const searchParam = `%${search}%`;
-    params.push(searchParam, searchParam, searchParam, searchParam);
-  }
-  if (category) {
-    sql += ` AND category = ?`;
-    params.push(category);
-  }
-  if (city) {
-    sql += ` AND city = ?`;
-    params.push(city);
-  }
-  if (verified !== undefined) {
-    sql += ` AND isVerified = ?`;
-    params.push(verified === 'true' ? 1 : 0);
-  }
-  if (ownerId) {
-    sql += ` AND ownerId = ?`;
-    params.push(ownerId);
-  }
-
   try {
-    const list = await dbAll(sql, params);
-    // Convert isVerified back to boolean
-    const result = list.map(b => ({ ...b, isVerified: !!b.isVerified }));
-    res.json(result);
+    const list = await db.businesses.getAll({
+      search,
+      category,
+      city,
+      isVerified: verified !== undefined ? (verified === 'true') : undefined,
+      ownerId
+    });
+    res.json(list);
   } catch (err) {
     res.status(500).json({ error: 'Failed to retrieve businesses' });
   }
@@ -440,11 +224,11 @@ app.get('/api/businesses', async (req, res) => {
 // GET /api/businesses/:id
 app.get('/api/businesses/:id', async (req, res) => {
   try {
-    const biz = await dbGet(`SELECT * FROM businesses WHERE id = ?`, [req.params.id]);
+    const biz = await db.businesses.getById(req.params.id);
     if (!biz) {
       return res.status(404).json({ error: 'Business details not found' });
     }
-    res.json({ ...biz, isVerified: !!biz.isVerified });
+    res.json(biz);
   } catch (err) {
     res.status(500).json({ error: 'Database fetch error' });
   }
@@ -462,12 +246,27 @@ app.post('/api/businesses', authenticateToken, requireRole('owner'), async (req,
     const bizId = 'b_' + Date.now() + Math.random().toString(36).substr(2, 5);
     const createdAt = new Date().toISOString();
 
-    await dbRun(`INSERT INTO businesses (id, ownerId, name, category, address, city, state, phone, email, description, openTime, closeTime, logo, isVerified, rating, reviewCount, createdAt)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [bizId, req.user.id, name, category, address, city, state, phone, email, description, openTime || '09:00', closeTime || '18:00', '', 0, 0.0, 0, createdAt]);
+    const created = await db.businesses.create({
+      id: bizId,
+      ownerId: req.user.id,
+      name,
+      category,
+      address,
+      city,
+      state,
+      phone,
+      email,
+      description,
+      openTime: openTime || '09:00',
+      closeTime: closeTime || '18:00',
+      logo: '',
+      isVerified: 0,
+      rating: 0.0,
+      reviewCount: 0,
+      createdAt
+    });
 
-    const created = await dbGet(`SELECT * FROM businesses WHERE id = ?`, [bizId]);
-    res.status(201).json({ ...created, isVerified: !!created.isVerified });
+    res.status(201).json(created);
   } catch (err) {
     res.status(500).json({ error: 'Failed to create business listing' });
   }
@@ -476,7 +275,7 @@ app.post('/api/businesses', authenticateToken, requireRole('owner'), async (req,
 // PUT /api/businesses/:id (Protected, Owner / Admin update)
 app.put('/api/businesses/:id', authenticateToken, async (req, res) => {
   try {
-    const biz = await dbGet(`SELECT * FROM businesses WHERE id = ?`, [req.params.id]);
+    const biz = await db.businesses.getById(req.params.id);
     if (!biz) {
       return res.status(404).json({ error: 'Business not found' });
     }
@@ -488,26 +287,21 @@ app.put('/api/businesses/:id', authenticateToken, async (req, res) => {
 
     const { name, category, address, city, state, phone, email, description, openTime, closeTime, isVerified } = req.body;
 
-    const sql = `UPDATE businesses SET
-      name = COALESCE(?, name),
-      category = COALESCE(?, category),
-      address = COALESCE(?, address),
-      city = COALESCE(?, city),
-      state = COALESCE(?, state),
-      phone = COALESCE(?, phone),
-      email = COALESCE(?, email),
-      description = COALESCE(?, description),
-      openTime = COALESCE(?, openTime),
-      closeTime = COALESCE(?, closeTime),
-      isVerified = COALESCE(?, isVerified)
-      WHERE id = ?`;
+    const dataToUpdate = {};
+    if (name !== undefined) dataToUpdate.name = name;
+    if (category !== undefined) dataToUpdate.category = category;
+    if (address !== undefined) dataToUpdate.address = address;
+    if (city !== undefined) dataToUpdate.city = city;
+    if (state !== undefined) dataToUpdate.state = state;
+    if (phone !== undefined) dataToUpdate.phone = phone;
+    if (email !== undefined) dataToUpdate.email = email;
+    if (description !== undefined) dataToUpdate.description = description;
+    if (openTime !== undefined) dataToUpdate.openTime = openTime;
+    if (closeTime !== undefined) dataToUpdate.closeTime = closeTime;
+    if (isVerified !== undefined) dataToUpdate.isVerified = isVerified ? 1 : 0;
 
-    const isVerifiedInt = isVerified !== undefined ? (isVerified ? 1 : 0) : null;
-
-    await dbRun(sql, [name, category, address, city, state, phone, email, description, openTime, closeTime, isVerifiedInt, req.params.id]);
-
-    const updated = await dbGet(`SELECT * FROM businesses WHERE id = ?`, [req.params.id]);
-    res.json({ ...updated, isVerified: !!updated.isVerified });
+    const updated = await db.businesses.update(req.params.id, dataToUpdate);
+    res.json({ ...biz, ...updated });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update business details' });
   }
@@ -516,7 +310,7 @@ app.put('/api/businesses/:id', authenticateToken, async (req, res) => {
 // DELETE /api/businesses/:id (Protected, Owner / Admin)
 app.delete('/api/businesses/:id', authenticateToken, async (req, res) => {
   try {
-    const biz = await dbGet(`SELECT * FROM businesses WHERE id = ?`, [req.params.id]);
+    const biz = await db.businesses.getById(req.params.id);
     if (!biz) {
       return res.status(404).json({ error: 'Business not found' });
     }
@@ -525,7 +319,7 @@ app.delete('/api/businesses/:id', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Unauthorized to delete this business' });
     }
 
-    await dbRun(`DELETE FROM businesses WHERE id = ?`, [req.params.id]);
+    await db.businesses.delete(req.params.id);
     res.json({ success: true, message: 'Business successfully deleted' });
   } catch (err) {
     res.status(500).json({ error: 'Database delete error' });
@@ -537,16 +331,8 @@ app.delete('/api/businesses/:id', authenticateToken, async (req, res) => {
 // GET /api/services (Filter by businessId)
 app.get('/api/services', async (req, res) => {
   const { businessId } = req.query;
-  let sql = `SELECT * FROM services`;
-  const params = [];
-
-  if (businessId) {
-    sql += ` WHERE businessId = ?`;
-    params.push(businessId);
-  }
-
   try {
-    const list = await dbAll(sql, params);
+    const list = await db.services.getAll(businessId);
     res.json(list);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch services' });
@@ -556,7 +342,7 @@ app.get('/api/services', async (req, res) => {
 // GET /api/services/:id
 app.get('/api/services/:id', async (req, res) => {
   try {
-    const service = await dbGet(`SELECT * FROM services WHERE id = ?`, [req.params.id]);
+    const service = await db.services.getById(req.params.id);
     if (!service) {
       return res.status(404).json({ error: 'Service option not found' });
     }
@@ -575,8 +361,7 @@ app.post('/api/services', authenticateToken, requireRole('owner'), async (req, r
   }
 
   try {
-    // Check if business belongs to owner
-    const biz = await dbGet(`SELECT * FROM businesses WHERE id = ?`, [businessId]);
+    const biz = await db.businesses.getById(businessId);
     if (!biz || biz.ownerId !== req.user.id) {
       return res.status(403).json({ error: 'Unauthorized access to this business profile' });
     }
@@ -584,10 +369,17 @@ app.post('/api/services', authenticateToken, requireRole('owner'), async (req, r
     const svcId = 's_' + Date.now() + Math.random().toString(36).substr(2, 5);
     const createdAt = new Date().toISOString();
 
-    await dbRun(`INSERT INTO services (id, businessId, name, description, price, duration, image, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [svcId, businessId, name, description || '', price, duration, '', createdAt]);
+    const created = await db.services.create({
+      id: svcId,
+      businessId,
+      name,
+      description: description || '',
+      price: Number(price),
+      duration,
+      image: '',
+      createdAt
+    });
 
-    const created = await dbGet(`SELECT * FROM services WHERE id = ?`, [svcId]);
     res.status(201).json(created);
   } catch (err) {
     res.status(500).json({ error: 'Failed to create service option' });
@@ -597,27 +389,26 @@ app.post('/api/services', authenticateToken, requireRole('owner'), async (req, r
 // PUT /api/services/:id (Protected, Owner only)
 app.put('/api/services/:id', authenticateToken, requireRole('owner'), async (req, res) => {
   try {
-    const service = await dbGet(`SELECT * FROM services WHERE id = ?`, [req.params.id]);
+    const service = await db.services.getById(req.params.id);
     if (!service) {
       return res.status(404).json({ error: 'Service not found' });
     }
 
-    const biz = await dbGet(`SELECT * FROM businesses WHERE id = ?`, [service.businessId]);
+    const biz = await db.businesses.getById(service.businessId);
     if (!biz || biz.ownerId !== req.user.id) {
       return res.status(403).json({ error: 'Unauthorized to modify this service' });
     }
 
     const { name, description, price, duration } = req.body;
 
-    await dbRun(`UPDATE services SET
-      name = COALESCE(?, name),
-      description = COALESCE(?, description),
-      price = COALESCE(?, price),
-      duration = COALESCE(?, duration)
-      WHERE id = ?`, [name, description, price, duration, req.params.id]);
+    const dataToUpdate = {};
+    if (name !== undefined) dataToUpdate.name = name;
+    if (description !== undefined) dataToUpdate.description = description;
+    if (price !== undefined) dataToUpdate.price = Number(price);
+    if (duration !== undefined) dataToUpdate.duration = duration;
 
-    const updated = await dbGet(`SELECT * FROM services WHERE id = ?`, [req.params.id]);
-    res.json(updated);
+    const updated = await db.services.update(req.params.id, dataToUpdate);
+    res.json({ ...service, ...updated });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update service details' });
   }
@@ -626,17 +417,17 @@ app.put('/api/services/:id', authenticateToken, requireRole('owner'), async (req
 // DELETE /api/services/:id (Protected, Owner only)
 app.delete('/api/services/:id', authenticateToken, requireRole('owner'), async (req, res) => {
   try {
-    const service = await dbGet(`SELECT * FROM services WHERE id = ?`, [req.params.id]);
+    const service = await db.services.getById(req.params.id);
     if (!service) {
       return res.status(404).json({ error: 'Service option not found' });
     }
 
-    const biz = await dbGet(`SELECT * FROM businesses WHERE id = ?`, [service.businessId]);
+    const biz = await db.businesses.getById(service.businessId);
     if (!biz || biz.ownerId !== req.user.id) {
       return res.status(403).json({ error: 'Unauthorized access' });
     }
 
-    await dbRun(`DELETE FROM services WHERE id = ?`, [req.params.id]);
+    await db.services.delete(req.params.id);
     res.json({ success: true, message: 'Service option successfully deleted' });
   } catch (err) {
     res.status(500).json({ error: 'Database delete error' });
@@ -648,33 +439,17 @@ app.delete('/api/services/:id', authenticateToken, requireRole('owner'), async (
 // GET /api/bookings (Protected, returns bookings relevant to user role)
 app.get('/api/bookings', authenticateToken, async (req, res) => {
   const { businessId, status } = req.query;
-  let sql = '';
-  const params = [];
-
-  if (req.user.role === 'admin') {
-    sql = `SELECT * FROM bookings WHERE 1=1`;
-  } else if (req.user.role === 'owner') {
-    sql = `SELECT bks.* FROM bookings bks
-           JOIN businesses biz ON bks.businessId = biz.id
-           WHERE biz.ownerId = ?`;
-    params.push(req.user.id);
-  } else {
-    // customer
-    sql = `SELECT * FROM bookings WHERE userId = ?`;
-    params.push(req.user.id);
-  }
-
-  if (businessId) {
-    sql += ` AND businessId = ?`;
-    params.push(businessId);
-  }
-  if (status) {
-    sql += ` AND status = ?`;
-    params.push(status);
-  }
-
   try {
-    const list = await dbAll(sql, params);
+    const filters = {};
+    if (req.user.role === 'owner') {
+      filters.ownerId = req.user.id;
+    } else if (req.user.role === 'customer') {
+      filters.userId = req.user.id;
+    }
+    if (businessId) filters.businessId = businessId;
+    if (status) filters.status = status;
+
+    const list = await db.bookings.getAll(filters);
     res.json(list);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch bookings list' });
@@ -693,11 +468,18 @@ app.post('/api/bookings', authenticateToken, requireRole('customer'), async (req
     const bookingId = 'bk_' + Date.now() + Math.random().toString(36).substr(2, 5);
     const createdAt = new Date().toISOString();
 
-    await dbRun(`INSERT INTO bookings (id, userId, businessId, serviceId, bookingDate, time, status, totalAmount, createdAt)
-      VALUES (?, ?, ?, ?, ?, ?, 'pending', ?, ?)`,
-      [bookingId, req.user.id, businessId, serviceId, bookingDate, time, totalAmount, createdAt]);
+    const created = await db.bookings.create({
+      id: bookingId,
+      userId: req.user.id,
+      businessId,
+      serviceId,
+      bookingDate,
+      time,
+      status: 'pending',
+      totalAmount: Number(totalAmount),
+      createdAt
+    });
 
-    const created = await dbGet(`SELECT * FROM bookings WHERE id = ?`, [bookingId]);
     res.status(201).json(created);
   } catch (err) {
     res.status(500).json({ error: 'Failed to submit appointment booking' });
@@ -712,12 +494,12 @@ app.put('/api/bookings/:id', authenticateToken, async (req, res) => {
   }
 
   try {
-    const booking = await dbGet(`SELECT * FROM bookings WHERE id = ?`, [req.params.id]);
+    const booking = await db.bookings.getById(req.params.id);
     if (!booking) {
       return res.status(404).json({ error: 'Booking appointment not found' });
     }
 
-    const biz = await dbGet(`SELECT * FROM businesses WHERE id = ?`, [booking.businessId]);
+    const biz = await db.businesses.getById(booking.businessId);
     const isOwner = biz && biz.ownerId === req.user.id;
     const isCustomer = booking.userId === req.user.id;
     const isAdmin = req.user.role === 'admin';
@@ -732,9 +514,8 @@ app.put('/api/bookings/:id', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Customers can only cancel appointments' });
     }
 
-    await dbRun(`UPDATE bookings SET status = ? WHERE id = ?`, [status, req.params.id]);
-    const updated = await dbGet(`SELECT * FROM bookings WHERE id = ?`, [req.params.id]);
-    res.json(updated);
+    const updated = await db.bookings.updateStatus(req.params.id, status);
+    res.json({ ...booking, ...updated });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update booking status' });
   }
@@ -745,16 +526,8 @@ app.put('/api/bookings/:id', authenticateToken, async (req, res) => {
 // GET /api/reviews (Optional filter by businessId)
 app.get('/api/reviews', async (req, res) => {
   const { businessId } = req.query;
-  let sql = `SELECT * FROM reviews`;
-  const params = [];
-
-  if (businessId) {
-    sql += ` WHERE businessId = ?`;
-    params.push(businessId);
-  }
-
   try {
-    const list = await dbAll(sql, params);
+    const list = await db.reviews.getAll(businessId);
     res.json(list);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch reviews' });
@@ -771,7 +544,8 @@ app.post('/api/reviews', authenticateToken, requireRole('customer'), async (req,
 
   try {
     // Check if user already reviewed
-    const existing = await dbGet(`SELECT * FROM reviews WHERE userId = ? AND businessId = ?`, [req.user.id, businessId]);
+    const reviews = await db.reviews.getAll(businessId);
+    const existing = reviews.find(r => r.userId === req.user.id);
     if (existing) {
       return res.status(400).json({ error: 'You have already reviewed this business' });
     }
@@ -779,13 +553,15 @@ app.post('/api/reviews', authenticateToken, requireRole('customer'), async (req,
     const reviewId = 'r_' + Date.now() + Math.random().toString(36).substr(2, 5);
     const createdAt = new Date().toISOString();
 
-    await dbRun(`INSERT INTO reviews (id, userId, businessId, rating, comment, createdAt) VALUES (?, ?, ?, ?, ?, ?)`,
-      [reviewId, req.user.id, businessId, rating, comment, createdAt]);
+    const created = await db.reviews.create({
+      id: reviewId,
+      userId: req.user.id,
+      businessId,
+      rating: Number(rating),
+      comment,
+      createdAt
+    });
 
-    // Recalculate Business Average Rating
-    await updateBusinessRatingScore(businessId);
-
-    const created = await dbGet(`SELECT * FROM reviews WHERE id = ?`, [reviewId]);
     res.status(201).json(created);
   } catch (err) {
     res.status(500).json({ error: 'Failed to create review' });
@@ -795,31 +571,12 @@ app.post('/api/reviews', authenticateToken, requireRole('customer'), async (req,
 // DELETE /api/reviews/:id (Protected, Admin only)
 app.delete('/api/reviews/:id', authenticateToken, requireRole('admin'), async (req, res) => {
   try {
-    const review = await dbGet(`SELECT * FROM reviews WHERE id = ?`, [req.params.id]);
-    if (!review) {
-      return res.status(404).json({ error: 'Review not found' });
-    }
-
-    await dbRun(`DELETE FROM reviews WHERE id = ?`, [req.params.id]);
-
-    // Recalculate Business Rating
-    await updateBusinessRatingScore(review.businessId);
-
+    await db.reviews.delete(req.params.id);
     res.json({ success: true, message: 'Review successfully moderated and removed' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to delete review' });
   }
 });
-
-// Helper: Recalculate Business rating
-async function updateBusinessRatingScore(businessId) {
-  const list = await dbAll(`SELECT rating FROM reviews WHERE businessId = ?`, [businessId]);
-  const count = list.length;
-  const avg = count > 0 ? list.reduce((s, r) => s + r.rating, 0) / count : 0.0;
-  const ratingRounded = Math.round(avg * 10) / 10;
-
-  await dbRun(`UPDATE businesses SET rating = ?, reviewCount = ? WHERE id = ?`, [ratingRounded, count, businessId]);
-}
 
 /* ─── CHAT API ENDPOINTS ─────────────────────────────────────────── */
 
@@ -831,27 +588,22 @@ app.get('/api/chats', authenticateToken, async (req, res) => {
     return res.status(400).json({ error: 'businessId required' });
   }
 
-  // Determine interlocutors: req.user.id and (userId || business.ownerId)
   try {
-    const biz = await dbGet(`SELECT ownerId FROM businesses WHERE id = ?`, [businessId]);
+    const biz = await db.businesses.getById(businessId);
     if (!biz) {
       return res.status(404).json({ error: 'Business profile not found' });
     }
 
     const otherPartyId = userId || biz.ownerId;
 
-    // Retrieve chats between req.user.id and otherPartyId for this business
-    const chatsList = await dbAll(`
-      SELECT * FROM chats 
-      WHERE businessId = ? 
-      AND (
-        (senderId = ? AND receiverId = ?) 
-        OR (senderId = ? AND receiverId = ?)
-      )
-      ORDER BY createdAt ASC
-    `, [businessId, req.user.id, otherPartyId, otherPartyId, req.user.id]);
+    const chatsList = await db.chats.getAll();
+    const filtered = chatsList.filter(c => 
+      c.businessId === businessId &&
+      ((c.senderId === req.user.id && c.receiverId === otherPartyId) ||
+       (c.senderId === otherPartyId && c.receiverId === req.user.id))
+    );
 
-    res.json(chatsList);
+    res.json(filtered);
   } catch (err) {
     res.status(500).json({ error: 'Failed to load chat history' });
   }
@@ -860,18 +612,13 @@ app.get('/api/chats', authenticateToken, async (req, res) => {
 // GET /api/chats/all (Protected, helper for loading inbox threads list)
 app.get('/api/chats/all', authenticateToken, async (req, res) => {
   try {
-    // If admin, return all chats. Else, return chats involving req.user.id (either sender or receiver)
-    let list;
+    const list = await db.chats.getAll();
     if (req.user.role === 'admin') {
-      list = await dbAll(`SELECT * FROM chats ORDER BY createdAt ASC`);
+      res.json(list);
     } else {
-      list = await dbAll(`
-        SELECT * FROM chats 
-        WHERE senderId = ? OR receiverId = ?
-        ORDER BY createdAt ASC
-      `, [req.user.id, req.user.id]);
+      const filtered = list.filter(c => c.senderId === req.user.id || c.receiverId === req.user.id);
+      res.json(filtered);
     }
-    res.json(list);
   } catch (err) {
     res.status(500).json({ error: 'Failed to retrieve message threads' });
   }
@@ -889,10 +636,16 @@ app.post('/api/chats', authenticateToken, async (req, res) => {
     const chatId = 'c_' + Date.now() + Math.random().toString(36).substr(2, 5);
     const time = new Date().toISOString();
 
-    await dbRun(`INSERT INTO chats (id, senderId, receiverId, businessId, message, time, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [chatId, req.user.id, receiverId, businessId, message, time, time]);
+    const created = await db.chats.create({
+      id: chatId,
+      senderId: req.user.id,
+      receiverId,
+      businessId,
+      message,
+      time,
+      createdAt: time
+    });
 
-    const created = await dbGet(`SELECT * FROM chats WHERE id = ?`, [chatId]);
     res.status(201).json(created);
   } catch (err) {
     res.status(500).json({ error: 'Failed to send message' });
@@ -904,21 +657,21 @@ app.post('/api/chats', authenticateToken, async (req, res) => {
 // GET /api/stats (Protected, Admin only)
 app.get('/api/stats', authenticateToken, requireRole('admin'), async (req, res) => {
   try {
-    const users = await dbGet(`SELECT count(*) as count FROM users WHERE role != 'admin'`);
-    const businesses = await dbGet(`SELECT count(*) as count FROM businesses`);
-    const bookings = await dbGet(`SELECT count(*) as count FROM bookings`);
-    const pending = await dbGet(`SELECT count(*) as count FROM businesses WHERE isVerified = 0`);
-    
-    // Revenue calculations
-    const revRow = await dbGet(`SELECT sum(totalAmount) as total FROM bookings WHERE status = 'completed'`);
-    const totalRevenue = revRow.total || 0;
+    const users = await db.users.getAll();
+    const businesses = await db.businesses.getAll();
+    const bookings = await db.bookings.getAll();
+
+    const nonAdminUsersCount = users.filter(u => u.role !== 'admin').length;
+    const pendingBusinessesCount = businesses.filter(b => Number(b.isVerified) === 0).length;
+    const completedBookings = bookings.filter(b => b.status === 'completed');
+    const totalRevenue = completedBookings.reduce((sum, b) => sum + Number(b.totalAmount), 0);
 
     res.json({
-      totalUsers: users.count,
-      totalBusinesses: businesses.count,
-      totalBookings: bookings.count,
+      totalUsers: nonAdminUsersCount,
+      totalBusinesses: businesses.length,
+      totalBookings: bookings.length,
       totalRevenue,
-      pendingVerification: pending.count
+      pendingVerification: pendingBusinessesCount
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to load system metrics' });

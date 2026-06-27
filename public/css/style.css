@@ -6,54 +6,55 @@
 
 /* ── CSS Custom Properties ──────────────────────────────────── */
 :root {
-  --navy: #0a0f1e;
-  --navy-light: #0f1729;
-  --navy-card: #141d35;
-  --navy-hover: #1a2545;
-  --teal: #00d4aa;
-  --teal-dark: #00a884;
-  --teal-glow: rgba(0, 212, 170, 0.15);
-  --gold: #ffd700;
-  --gold-dark: #e6c200;
-  --purple: #7c3aed;
-  --rose: #f43f5e;
-  --text-primary: #ffffff;
-  --text-secondary: #8892b0;
-  --text-muted: #4a5568;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(0, 212, 170, 0.3);
-  --glass: rgba(255, 255, 255, 0.04);
-  --glass-hover: rgba(255, 255, 255, 0.07);
-  --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  --shadow-teal: 0 8px 32px rgba(0, 212, 170, 0.15);
+  --navy: #05060f;
+  --navy-light: #0b0c16;
+  --navy-card: rgba(18, 20, 38, 0.45);
+  --navy-hover: rgba(28, 30, 58, 0.6);
+  --teal: #00f2fe;
+  --teal-dark: #00c6ff;
+  --teal-glow: rgba(0, 242, 254, 0.15);
+  --gold: #ffaa00;
+  --gold-dark: #cc8800;
+  --purple: #8b5cf6;
+  --purple-glow: rgba(139, 92, 246, 0.15);
+  --rose: #ff2a5f;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #475569;
+  --border: rgba(255, 255, 255, 0.05);
+  --border-hover: rgba(0, 242, 254, 0.25);
+  --glass: rgba(255, 255, 255, 0.02);
+  --glass-hover: rgba(255, 255, 255, 0.05);
+  --shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  --shadow-teal: 0 0 20px rgba(0, 242, 254, 0.25);
   --radius: 16px;
-  --radius-sm: 8px;
-  --radius-xs: 4px;
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --nav-height: 70px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+  --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --nav-height: 72px;
 }
 
 [data-theme="light"] {
   --navy: #f8fafc;
   --navy-light: #ffffff;
-  --navy-card: #f1f5f9;
-  --navy-hover: #e2e8f0;
-  --teal: #0d9488;
-  --teal-dark: #0f766e;
-  --teal-glow: rgba(13, 148, 136, 0.12);
+  --navy-card: rgba(241, 245, 249, 0.8);
+  --navy-hover: rgba(226, 232, 240, 0.9);
+  --teal: #0ea5e9;
+  --teal-dark: #0284c7;
+  --teal-glow: rgba(14, 165, 233, 0.12);
   --gold: #d97706;
   --gold-dark: #b45309;
-  --purple: #6d28d9;
+  --purple: #7c3aed;
   --rose: #e11d48;
   --text-primary: #0f172a;
   --text-secondary: #475569;
   --text-muted: #94a3b8;
-  --border: rgba(15, 23, 42, 0.08);
-  --border-hover: rgba(13, 148, 136, 0.3);
-  --glass: rgba(15, 23, 42, 0.03);
-  --glass-hover: rgba(15, 23, 42, 0.06);
-  --shadow: 0 8px 32px rgba(15, 23, 42, 0.1);
-  --shadow-teal: 0 8px 32px rgba(13, 148, 136, 0.1);
+  --border: rgba(15, 23, 42, 0.06);
+  --border-hover: rgba(14, 165, 233, 0.25);
+  --glass: rgba(15, 23, 42, 0.02);
+  --glass-hover: rgba(15, 23, 42, 0.04);
+  --shadow: 0 12px 40px rgba(15, 23, 42, 0.06);
+  --shadow-teal: 0 0 20px rgba(14, 165, 233, 0.12);
 }
 
 /* ── Reset ──────────────────────────────────────────────────── */
@@ -83,7 +84,7 @@ ul { list-style: none; }
 
 /* ── Typography ─────────────────────────────────────────────── */
 h1, h2, h3, h4, h5, h6 { font-family: 'Outfit', sans-serif; line-height: 1.2; }
-.gradient-text { background: linear-gradient(135deg, var(--teal), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.gradient-text { background: linear-gradient(135deg, var(--teal), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .section-title {
   font-size: 2rem; font-family: 'Outfit', sans-serif; font-weight: 700;
   margin-bottom: 12px; position: relative; display: inline-block;
@@ -102,13 +103,13 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Outfit', sans-serif; line-height: 1.2; }
   border: 2px solid transparent; white-space: nowrap;
 }
 .btn-primary {
-  background: var(--teal); color: var(--navy); border-color: var(--teal);
+  background: linear-gradient(135deg, var(--teal), var(--teal-dark)); color: #05060f; border: none;
 }
-.btn-primary:hover { background: var(--teal-dark); border-color: var(--teal-dark); transform: translateY(-2px); box-shadow: var(--shadow-teal); }
-.btn-secondary { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-teal); }
+.btn-secondary { background: var(--gold); color: #05060f; border-color: var(--gold); }
 .btn-secondary:hover { background: var(--gold-dark); border-color: var(--gold-dark); transform: translateY(-2px); }
 .btn-outline { background: transparent; color: var(--teal); border-color: var(--teal); }
-.btn-outline:hover { background: var(--teal); color: var(--navy); transform: translateY(-2px); }
+.btn-outline:hover { background: var(--teal); color: #05060f; transform: translateY(-2px); }
 .btn-danger { background: rgba(244, 63, 94, 0.15); color: var(--rose); border-color: rgba(244, 63, 94, 0.3); }
 .btn-danger:hover { background: var(--rose); color: white; }
 .btn-ghost { background: var(--glass); color: var(--text-primary); border-color: var(--border); }
@@ -119,14 +120,14 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Outfit', sans-serif; line-height: 1.2; }
 
 /* ── Cards ──────────────────────────────────────────────────── */
 .card {
-  background: var(--glass); backdrop-filter: blur(10px);
+  background: var(--navy-card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border); border-radius: var(--radius);
   transition: var(--transition);
 }
 .card:hover { border-color: var(--border-hover); box-shadow: var(--shadow); }
 .glass-card {
-  background: var(--navy-card); border: 1px solid var(--border);
-  border-radius: var(--radius); box-shadow: var(--shadow);
+  background: var(--navy-card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow);
 }
 
 /* ── Badges ─────────────────────────────────────────────────── */
@@ -145,10 +146,23 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Outfit', sans-serif; line-height: 1.2; }
 
 /* ── Tag Pills ──────────────────────────────────────────────── */
 .tag {
-  display: inline-flex; align-items: center; gap: 5px;
+  display: inline-flex; align-items: center; gap: 6px;
   padding: 5px 12px; border-radius: 100px;
   background: var(--teal-glow); color: var(--teal);
   font-size: 0.78rem; font-weight: 500;
+  border: 1px solid rgba(0, 242, 254, 0.15);
+}
+.tag-svg-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+}
+.tag-svg-wrapper svg {
+  width: 100%;
+  height: 100%;
+  stroke-width: 2.5px;
 }
 
 /* ── Stars ──────────────────────────────────────────────────── */

@@ -41,11 +41,11 @@ function loadFeaturedBusinesses() {
       : '';
     const ratingHtml = App.renderStars(biz.rating);
     const coverGradient = App.getCategoryColor(biz.category);
-    const categoryIcon = App.getCategoryIcon(biz.category);
+    const categoryIcon = App.getCategorySvg(biz.category);
     const coverStyle = biz.logo 
       ? `background-image: url('${biz.logo}'); background-size: cover; background-position: center;`
       : `background: ${coverGradient}`;
-    const coverContent = biz.logo ? '' : categoryIcon;
+    const coverContent = biz.logo ? '' : `<div class="card-cover-svg-wrapper">${categoryIcon}</div>`;
 
     return `
       <div class="biz-card" onclick="window.location.href='business-detail.html?id=${biz.id}'">
@@ -62,10 +62,6 @@ function loadFeaturedBusinesses() {
             <span style="color:var(--text-secondary)">(${biz.reviewCount || 0})</span>
           </div>
           <div class="biz-card-location">📍 ${biz.city}, ${biz.state}</div>
-          <p class="biz-card-desc">${biz.description}</p>
-          <div style="margin-top: 15px;">
-            <button class="btn btn-outline btn-sm" style="width:100%">View Details</button>
-          </div>
         </div>
       </div>
     `;
