@@ -54,43 +54,11 @@ function seedMock() {
     { id: 'u_own2', name: 'Sneha Patel', email: 'owner2@lbm.com', password: hashOwner, role: 'owner', phone: '9823456789', createdAt: '2024-02-05T00:00:00Z' }
   ];
 
-  mockData.businesses = [
-    { id: 'b001', ownerId: 'u_own1', name: 'Ram Fitness Gym', category: 'Fitness', address: '12 Anna Salai, Chennai', city: 'Chennai', state: 'Tamil Nadu', phone: '9812345678', email: 'owner@lbm.com', description: 'Best gym in town with modern equipment and certified trainers. We offer personal training, group classes, and nutrition counseling.', openTime: '06:00', closeTime: '22:00', logo: 'uploads/gym.png', isVerified: 1, rating: 4.7, reviewCount: 48, createdAt: '2024-01-20T00:00:00Z' },
-    { id: 'b002', ownerId: 'u_own2', name: 'Glow Beauty Spa', category: 'Beauty & Spa', address: '45 Linking Road, Bandra', city: 'Mumbai', state: 'Maharashtra', phone: '9823456789', email: 'owner2@lbm.com', description: 'Premium beauty salon and spa offering facials, hair treatments, massages, and bridal packages. Relax and rejuvenate in our luxury setting.', openTime: '09:00', closeTime: '20:00', logo: 'uploads/spa.png', isVerified: 1, rating: 4.5, reviewCount: 32, createdAt: '2024-02-05T00:00:00Z' },
-    { id: 'b003', ownerId: 'u_own1', name: 'QuickFix Home Services', category: 'Home Services', address: '7 Connaught Place', city: 'Delhi', state: 'Delhi NCR', phone: '9845678901', email: 'owner@lbm.com', description: 'Professional home repair and maintenance services. Plumbing, electrical, carpentry, painting, and more. Quick response, quality work guaranteed.', openTime: '08:00', closeTime: '19:00', logo: 'uploads/home_service.png', isVerified: 0, rating: 4.2, reviewCount: 21, createdAt: '2024-03-01T00:00:00Z' }
-  ];
-
-  mockData.services = [
-    { id: 's001', businessId: 'b001', name: 'Personal Training', description: '1-on-1 training session with certified trainer tailored to your fitness goals.', price: 2000, duration: '1 hour', image: '', createdAt: '2024-01-21T00:00:00Z' },
-    { id: 's002', businessId: 'b001', name: 'Monthly Membership', description: 'Unlimited gym access for a full month. All equipment included.', price: 1500, duration: 'Monthly', image: '', createdAt: '2024-01-21T00:00:00Z' },
-    { id: 's003', businessId: 'b001', name: 'Diet Consultation', description: 'Personalized diet plan from our certified nutritionist.', price: 800, duration: '45 min', image: '', createdAt: '2024-01-22T00:00:00Z' },
-    { id: 's004', businessId: 'b002', name: 'Full Body Massage', description: 'Relaxing full body Swedish massage to relieve stress and tension.', price: 1800, duration: '1 hour', image: '', createdAt: '2024-02-06T00:00:00Z' },
-    { id: 's005', businessId: 'b002', name: 'Bridal Package', description: 'Complete bridal beauty package including makeup, hair, and skincare.', price: 12000, duration: 'Half day', image: '', createdAt: '2024-02-06T00:00:00Z' },
-    { id: 's006', businessId: 'b002', name: 'Facial Treatment', description: 'Deep cleansing facial with premium organic products.', price: 1200, duration: '1 hour', image: '', createdAt: '2024-02-07T00:00:00Z' },
-    { id: 's007', businessId: 'b003', name: 'Plumbing Repair', description: 'Fix leaks, blocked drains, pipe repairs and installation.', price: 500, duration: '1-2 hours', image: '', createdAt: '2024-03-02T00:00:00Z' },
-    { id: 's008', businessId: 'b003', name: 'Electrical Work', description: 'Wiring, switches, fan installation, and all electrical repairs.', price: 700, duration: '1-3 hours', image: '', createdAt: '2024-03-02T00:00:00Z' }
-  ];
-
-  mockData.bookings = [
-    { id: 'bk001', userId: 'u_cust1', businessId: 'b001', serviceId: 's001', bookingDate: '2026-07-01', time: '10:00 AM', status: 'confirmed', totalAmount: 2000, createdAt: '2024-06-25T00:00:00Z' },
-    { id: 'bk002', userId: 'u_cust1', businessId: 'b001', serviceId: 's002', bookingDate: '2026-07-01', time: '06:00 AM', status: 'pending', totalAmount: 1500, createdAt: '2024-06-26T00:00:00Z' },
-    { id: 'bk003', userId: 'u_cust2', businessId: 'b002', serviceId: 's004', bookingDate: '2026-06-20', time: '02:00 PM', status: 'completed', totalAmount: 1800, createdAt: '2024-06-15T00:00:00Z' },
-    { id: 'bk004', userId: 'u_cust1', businessId: 'b002', serviceId: 's006', bookingDate: '2026-06-15', time: '11:00 AM', status: 'completed', totalAmount: 1200, createdAt: '2024-06-10T00:00:00Z' },
-    { id: 'bk005', userId: 'u_cust2', businessId: 'b003', serviceId: 's007', bookingDate: '2026-07-05', time: '09:00 AM', status: 'pending', totalAmount: 500, createdAt: '2024-06-28T00:00:00Z' }
-  ];
-
-  mockData.reviews = [
-    { id: 'r001', userId: 'u_cust1', businessId: 'b001', rating: 5, comment: 'Amazing gym! The trainers are very professional and the equipment is top-notch. Highly recommend!', createdAt: '2024-06-20T00:00:00Z' },
-    { id: 'r002', userId: 'u_cust2', businessId: 'b002', rating: 4, comment: 'Lovely spa experience. Very relaxing and professional staff. Will definitely come back!', createdAt: '2024-06-21T00:00:00Z' },
-    { id: 'r003', userId: 'u_cust1', businessId: 'b002', rating: 5, comment: 'Best facial I have ever had. My skin feels amazing!', createdAt: '2024-06-17T00:00:00Z' }
-  ];
-
-  mockData.chats = [
-    { id: 'c001', senderId: 'u_cust1', receiverId: 'u_own1', businessId: 'b001', message: 'Hi, I want to know about personal training sessions.', time: '2024-06-25T10:30:00Z', createdAt: '2024-06-25T10:30:00Z' },
-    { id: 'c002', senderId: 'u_own1', receiverId: 'u_cust1', businessId: 'b001', message: 'Sure! Please let me know your fitness goals and preferred time slots.', time: '2024-06-25T10:32:00Z', createdAt: '2024-06-25T10:32:00Z' },
-    { id: 'c003', senderId: 'u_cust1', receiverId: 'u_own1', businessId: 'b001', message: 'I want to lose weight and build muscle. Morning slots preferred.', time: '2024-06-25T10:35:00Z', createdAt: '2024-06-25T10:35:00Z' },
-    { id: 'c004', senderId: 'u_own1', receiverId: 'u_cust1', businessId: 'b001', message: 'Great! We have 6 AM and 7 AM slots available. Book online or visit us directly.', time: '2024-06-25T10:37:00Z', createdAt: '2024-06-25T10:37:00Z' }
-  ];
+  mockData.businesses = [];
+  mockData.services = [];
+  mockData.bookings = [];
+  mockData.reviews = [];
+  mockData.chats = [];
 }
 
 // Helper to convert Firestore snapshot to array
@@ -444,43 +412,11 @@ db.seed = async function() {
     { id: 'u_own2', name: 'Sneha Patel', email: 'owner2@lbm.com', password: hashOwner, role: 'owner', phone: '9823456789', createdAt: '2024-02-05T00:00:00Z' }
   ];
 
-  const businesses = [
-    { id: 'b001', ownerId: 'u_own1', name: 'Ram Fitness Gym', category: 'Fitness', address: '12 Anna Salai, Chennai', city: 'Chennai', state: 'Tamil Nadu', phone: '9812345678', email: 'owner@lbm.com', description: 'Best gym in town with modern equipment and certified trainers. We offer personal training, group classes, and nutrition counseling.', openTime: '06:00', closeTime: '22:00', logo: 'uploads/gym.png', isVerified: 1, rating: 4.7, reviewCount: 48, createdAt: '2024-01-20T00:00:00Z' },
-    { id: 'b002', ownerId: 'u_own2', name: 'Glow Beauty Spa', category: 'Beauty & Spa', address: '45 Linking Road, Bandra', city: 'Mumbai', state: 'Maharashtra', phone: '9823456789', email: 'owner2@lbm.com', description: 'Premium beauty salon and spa offering facials, hair treatments, massages, and bridal packages. Relax and rejuvenate in our luxury setting.', openTime: '09:00', closeTime: '20:00', logo: 'uploads/spa.png', isVerified: 1, rating: 4.5, reviewCount: 32, createdAt: '2024-02-05T00:00:00Z' },
-    { id: 'b003', ownerId: 'u_own1', name: 'QuickFix Home Services', category: 'Home Services', address: '7 Connaught Place', city: 'Delhi', state: 'Delhi NCR', phone: '9845678901', email: 'owner@lbm.com', description: 'Professional home repair and maintenance services. Plumbing, electrical, carpentry, painting, and more. Quick response, quality work guaranteed.', openTime: '08:00', closeTime: '19:00', logo: 'uploads/home_service.png', isVerified: 0, rating: 4.2, reviewCount: 21, createdAt: '2024-03-01T00:00:00Z' }
-  ];
-
-  const services = [
-    { id: 's001', businessId: 'b001', name: 'Personal Training', description: '1-on-1 training session with certified trainer tailored to your fitness goals.', price: 2000, duration: '1 hour', image: '', createdAt: '2024-01-21T00:00:00Z' },
-    { id: 's002', businessId: 'b001', name: 'Monthly Membership', description: 'Unlimited gym access for a full month. All equipment included.', price: 1500, duration: 'Monthly', image: '', createdAt: '2024-01-21T00:00:00Z' },
-    { id: 's003', businessId: 'b001', name: 'Diet Consultation', description: 'Personalized diet plan from our certified nutritionist.', price: 800, duration: '45 min', image: '', createdAt: '2024-01-22T00:00:00Z' },
-    { id: 's004', businessId: 'b002', name: 'Full Body Massage', description: 'Relaxing full body Swedish massage to relieve stress and tension.', price: 1800, duration: '1 hour', image: '', createdAt: '2024-02-06T00:00:00Z' },
-    { id: 's005', businessId: 'b002', name: 'Bridal Package', description: 'Complete bridal beauty package including makeup, hair, and skincare.', price: 12000, duration: 'Half day', image: '', createdAt: '2024-02-06T00:00:00Z' },
-    { id: 's006', businessId: 'b002', name: 'Facial Treatment', description: 'Deep cleansing facial with premium organic products.', price: 1200, duration: '1 hour', image: '', createdAt: '2024-02-07T00:00:00Z' },
-    { id: 's007', businessId: 'b003', name: 'Plumbing Repair', description: 'Fix leaks, blocked drains, pipe repairs and installation.', price: 500, duration: '1-2 hours', image: '', createdAt: '2024-03-02T00:00:00Z' },
-    { id: 's008', businessId: 'b003', name: 'Electrical Work', description: 'Wiring, switches, fan installation, and all electrical repairs.', price: 700, duration: '1-3 hours', image: '', createdAt: '2024-03-02T00:00:00Z' }
-  ];
-
-  const bookings = [
-    { id: 'bk001', userId: 'u_cust1', businessId: 'b001', serviceId: 's001', bookingDate: '2026-07-01', time: '10:00 AM', status: 'confirmed', totalAmount: 2000, createdAt: '2024-06-25T00:00:00Z' },
-    { id: 'bk002', userId: 'u_cust1', businessId: 'b001', serviceId: 's002', bookingDate: '2026-07-01', time: '06:00 AM', status: 'pending', totalAmount: 1500, createdAt: '2024-06-26T00:00:00Z' },
-    { id: 'bk003', userId: 'u_cust2', businessId: 'b002', serviceId: 's004', bookingDate: '2026-06-20', time: '02:00 PM', status: 'completed', totalAmount: 1800, createdAt: '2024-06-15T00:00:00Z' },
-    { id: 'bk004', userId: 'u_cust1', businessId: 'b002', serviceId: 's006', bookingDate: '2026-06-15', time: '11:00 AM', status: 'completed', totalAmount: 1200, createdAt: '2024-06-10T00:00:00Z' },
-    { id: 'bk005', userId: 'u_cust2', businessId: 'b003', serviceId: 's007', bookingDate: '2026-07-05', time: '09:00 AM', status: 'pending', totalAmount: 500, createdAt: '2024-06-28T00:00:00Z' }
-  ];
-
-  const reviews = [
-    { id: 'r001', userId: 'u_cust1', businessId: 'b001', rating: 5, comment: 'Amazing gym! The trainers are very professional and the equipment is top-notch. Highly recommend!', createdAt: '2024-06-20T00:00:00Z' },
-    { id: 'r002', userId: 'u_cust2', businessId: 'b002', rating: 4, comment: 'Lovely spa experience. Very relaxing and professional staff. Will definitely come back!', createdAt: '2024-06-21T00:00:00Z' },
-    { id: 'r003', userId: 'u_cust1', businessId: 'b002', rating: 5, comment: 'Best facial I have ever had. My skin feels amazing!', createdAt: '2024-06-17T00:00:00Z' }
-  ];
-
-  const chats = [
-    { id: 'c001', senderId: 'u_cust1', receiverId: 'u_own1', businessId: 'b001', message: 'Hi, I want to know about personal training sessions.', time: '2024-06-25T10:30:00Z', createdAt: '2024-06-25T10:30:00Z' },
-    { id: 'c002', senderId: 'u_own1', receiverId: 'u_cust1', businessId: 'b001', message: 'Sure! Please let me know your fitness goals and preferred time slots.', time: '2024-06-25T10:32:00Z', createdAt: '2024-06-25T10:32:00Z' },
-    { id: 'c003', senderId: 'u_cust1', receiverId: 'u_own1', businessId: 'b001', message: 'I want to lose weight and build muscle. Morning slots preferred.', time: '2024-06-25T10:35:00Z', createdAt: '2024-06-25T10:35:00Z' },
-    { id: 'c004', senderId: 'u_own1', receiverId: 'u_cust1', businessId: 'b001', message: 'Great! We have 6 AM and 7 AM slots available. Book online or visit us directly.', time: '2024-06-25T10:37:00Z', createdAt: '2024-06-25T10:37:00Z' }
-  ];
+  const businesses = [];
+  const services = [];
+  const bookings = [];
+  const reviews = [];
+  const chats = [];
 
   // Load into Firestore
   for (const u of users) {

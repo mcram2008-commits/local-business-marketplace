@@ -236,7 +236,7 @@ app.get('/api/businesses/:id', async (req, res) => {
 
 // POST /api/businesses (Protected, Owner only)
 app.post('/api/businesses', authenticateToken, requireRole('owner'), async (req, res) => {
-  const { name, category, address, city, state, phone, email, description, openTime, closeTime } = req.body;
+  const { name, category, address, city, state, phone, email, description, openTime, closeTime, latitude, longitude, logo } = req.body;
 
   if (!name || !category || !address || !city || !state || !phone || !email || !description) {
     return res.status(400).json({ error: 'Required business fields missing' });
@@ -259,7 +259,9 @@ app.post('/api/businesses', authenticateToken, requireRole('owner'), async (req,
       description,
       openTime: openTime || '09:00',
       closeTime: closeTime || '18:00',
-      logo: '',
+      logo: logo || '',
+      latitude: latitude ? parseFloat(latitude) : null,
+      longitude: longitude ? parseFloat(longitude) : null,
       isVerified: 0,
       rating: 0.0,
       reviewCount: 0,
@@ -285,7 +287,7 @@ app.put('/api/businesses/:id', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Forbidden update access' });
     }
 
-    const { name, category, address, city, state, phone, email, description, openTime, closeTime, isVerified } = req.body;
+    const { name, category, address, city, state, phone, email, description, openTime, closeTime, isVerified, latitude, longitude, logo } = req.body;
 
     const dataToUpdate = {};
     if (name !== undefined) dataToUpdate.name = name;
@@ -299,6 +301,9 @@ app.put('/api/businesses/:id', authenticateToken, async (req, res) => {
     if (openTime !== undefined) dataToUpdate.openTime = openTime;
     if (closeTime !== undefined) dataToUpdate.closeTime = closeTime;
     if (isVerified !== undefined) dataToUpdate.isVerified = isVerified ? 1 : 0;
+    if (latitude !== undefined) dataToUpdate.latitude = latitude ? parseFloat(latitude) : null;
+    if (longitude !== undefined) dataToUpdate.longitude = longitude ? parseFloat(longitude) : null;
+    if (logo !== undefined) dataToUpdate.logo = logo;
 
     const updated = await db.businesses.update(req.params.id, dataToUpdate);
     res.json({ ...biz, ...updated });

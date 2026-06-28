@@ -23,7 +23,7 @@
     <div class="auth-features">
       <div class="auth-feature">
         <div class="auth-feature-icon">✓</div>
-        <span>500+ Trusted Local Businesses</span>
+        <span>Trusted Local Businesses</span>
       </div>
       <div class="auth-feature">
         <div class="auth-feature-icon">✓</div>
@@ -78,26 +78,6 @@
         </button>
       </form>
 
-      <div class="auth-divider">or use demo credentials</div>
-
-      <div class="demo-creds">
-        <div class="demo-creds-title">🔑 Quick Login Credentials</div>
-        <div class="demo-cred" data-email="admin@lbm.com" data-pass="admin123">
-          <span class="demo-cred-role">🛡️ Admin</span>
-          <span class="demo-cred-email">admin@lbm.com</span>
-          <span class="demo-cred-pass">admin123</span>
-        </div>
-        <div class="demo-cred" data-email="customer@lbm.com" data-pass="customer123">
-          <span class="demo-cred-role">👤 Customer</span>
-          <span class="demo-cred-email">customer@lbm.com</span>
-          <span class="demo-cred-pass">customer123</span>
-        </div>
-        <div class="demo-cred" data-email="owner@lbm.com" data-pass="owner123">
-          <span class="demo-cred-role">🏪 Business Owner</span>
-          <span class="demo-cred-email">owner@lbm.com</span>
-          <span class="demo-cred-pass">owner123</span>
-        </div>
-      </div>
 
       <p class="auth-footer-text">
         Don't have an account? <a href="register.html" class="auth-link">Create Account →</a>
@@ -126,14 +106,6 @@ document.addEventListener('DOMContentLoaded', function() {
     App.showToast('Password reset feature coming soon!', 'info');
   });
 
-  // Demo credentials click-to-fill
-  document.querySelectorAll('.demo-cred').forEach(function(el) {
-    el.addEventListener('click', function() {
-      document.getElementById('email').value = this.dataset.email;
-      document.getElementById('password').value = this.dataset.pass;
-      App.showToast('Credentials filled! Click Sign In.', 'info');
-    });
-  });
 
   // Form submit
   document.getElementById('login-form').addEventListener('submit', function(e) {

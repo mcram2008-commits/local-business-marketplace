@@ -7,6 +7,9 @@
   <meta name="description" content="Browse and filter local businesses by category, location, and rating.">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/business.css">
+  <!-- Leaflet Map API -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 <body>
 
@@ -86,14 +89,22 @@
       <main class="browse-main">
         <div class="sort-bar">
           <p class="results-count"><strong id="results-count">0</strong> businesses found</p>
-          <div style="display:flex; align-items:center; gap: 8px;">
-            <label for="sort-select" style="font-size:0.85rem; color:var(--text-secondary); white-space:nowrap;">Sort by:</label>
-            <select id="sort-select" class="form-control" style="width:auto; padding: 6px 12px; font-size: 0.85rem;">
-              <option value="newest">Newest First</option>
-              <option value="rating">Highest Rated</option>
-              <option value="name">A-Z</option>
-            </select>
+          <div style="display:flex; align-items:center; gap: 12px;">
+            <button id="btn-toggle-view" class="btn btn-secondary btn-sm" style="padding: 6px 12px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">🗺️ Map View</button>
+            <div style="display:flex; align-items:center; gap: 6px;">
+              <label for="sort-select" style="font-size:0.85rem; color:var(--text-secondary); white-space:nowrap;">Sort by:</label>
+              <select id="sort-select" class="form-control" style="width:auto; padding: 6px 12px; font-size: 0.85rem;">
+                <option value="newest">Newest First</option>
+                <option value="rating">Highest Rated</option>
+                <option value="name">A-Z</option>
+              </select>
+            </div>
           </div>
+        </div>
+
+        <!-- Map View Container -->
+        <div id="browse-map-container" class="hidden" style="width: 100%; height: 500px; border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; margin-bottom: 30px; position: relative; z-index: 1;">
+          <div id="browse-map" style="width: 100%; height: 100%;"></div>
         </div>
 
         <div id="business-grid" class="business-grid">

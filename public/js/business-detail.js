@@ -194,9 +194,82 @@ function renderOverview() {
             <button class="btn btn-outline btn-sm" style="margin-top: 10px; width: 100%; padding: 4px 8px; font-size: 0.75rem;" onclick="switchTab('chat')">Send Message</button>
           </div>
         </div>
+
+        <div class="card map-card" style="margin-top: 20px; padding: 20px; border: 1px solid var(--border);">
+          <h3 class="overview-title" style="margin-bottom:15px; font-size: 1.1rem;">📍 Location Map</h3>
+          <div id="biz-detail-map" style="width: 100%; height: 230px; border-radius: var(--radius-sm); border: 1px solid var(--border); overflow: hidden; z-index: 1;"></div>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 12px; margin-bottom: 0; line-height: 1.4;">
+            📍 ${business.address}, ${business.city}, ${business.state}
+          </p>
+        </div>
       </div>
     </div>
   `;
+
+  // Initialize Leaflet map asynchronously after DOM element is rendered
+  setTimeout(() => {
+    initDetailMap();
+  }, 100);
+}
+
+function initDetailMap() {
+  const mapContainer = document.getElementById('biz-detail-map');
+  if (!mapContainer || !business) return;
+
+  const defaultLat = 13.0827;
+  const defaultLng = 80.2707;
+  
+  const lat = business.latitude;
+  const lng = business.longitude;
+
+  const isDarkMode = document.documentElement.getAttribute('data-theme') !== 'light';
+  const tileUrl = isDarkMode 
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+  let map;
+  try {
+    map = L.map('biz-detail-map').setView([lat || defaultLat, lng || defaultLng], 14);
+  } catch (err) {
+    console.error('Error initializing Leaflet map:', err);
+    return;
+  }
+
+  L.tileLayer(tileUrl, {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    maxZoom: 20
+  }).addTo(map);
+
+  if (lat && lng) {
+    L.marker([lat, lng]).addTo(map)
+      .bindPopup(`<strong>${business.name}</strong><br>${business.address}`)
+      .openPopup();
+  } else {
+    // Fallback: Geocode coordinates on-the-fly
+    const fullAddress = [business.address, business.city, business.state].filter(Boolean).join(', ');
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}&limit=1`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          const newLat = parseFloat(data[0].lat);
+          const newLng = parseFloat(data[0].lon);
+          map.setView([newLat, newLng], 14);
+          L.marker([newLat, newLng]).addTo(map)
+            .bindPopup(`<strong>${business.name}</strong><br>${business.address}`)
+            .openPopup();
+        } else {
+          L.marker([defaultLat, defaultLng]).addTo(map)
+            .bindPopup(`<strong>${business.name}</strong><br>Coordinates not found`)
+            .openPopup();
+        }
+      })
+      .catch(err => {
+        console.error('Error geocoding address:', err);
+        L.marker([defaultLat, defaultLng]).addTo(map)
+          .bindPopup(`<strong>${business.name}</strong><br>Locating error`)
+          .openPopup();
+      });
+  }
 }
 
 /* ─── SERVICES PANEL ─────────────────────────────────────────────── */

@@ -357,3 +357,67 @@ textarea.form-control { resize: vertical; min-height: 100px; }
   .modal { max-height: 95vh; }
   .page-header h1 { font-size: 1.8rem; }
 }
+
+/* ── Leaflet Map Custom Theme Overrides ─────────────────────── */
+.leaflet-container {
+  background: var(--navy) !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.leaflet-bar {
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow) !important;
+  background-color: var(--navy-light) !important;
+}
+
+.leaflet-bar a, .leaflet-bar a:hover {
+  background-color: var(--navy-light) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border) !important;
+  transition: var(--transition);
+}
+
+.leaflet-bar a:hover {
+  background-color: var(--navy-hover) !important;
+  color: var(--teal) !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--navy-light) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--shadow) !important;
+  padding: 8px !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--navy-light) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.leaflet-popup-content {
+  margin: 6px !important;
+  line-height: 1.5 !important;
+}
+
+.leaflet-popup-close-button {
+  color: var(--text-secondary) !important;
+  padding: 8px !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: var(--rose) !important;
+}
+
+/* Custom styling for leaflet map popups */
+.map-popup-card .stars {
+  color: var(--gold);
+}
+.map-popup-card .btn-primary {
+  background: linear-gradient(135deg, var(--teal), var(--teal-dark)) !important;
+  color: var(--navy) !important;
+}
+.map-popup-card .btn-primary:hover {
+  box-shadow: var(--shadow-teal) !important;
+}

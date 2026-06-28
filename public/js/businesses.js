@@ -2,8 +2,12 @@
  * Local Business Marketplace - Browse Businesses Logic
  */
 let allBusinesses = [];
+let currentFilteredBusinesses = [];
 let categories = [];
 let locations = [];
+let currentView = 'list'; // 'list' or 'map'
+let browseMap = null;
+let markerGroup = null;
 
 document.addEventListener('DOMContentLoaded', () => {
   // Render Navigation
@@ -11,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Load all businesses from Store
   allBusinesses = Store.getBusinesses();
+  currentFilteredBusinesses = allBusinesses;
 
   // Extract categories and cities
   categories = [...new Set(allBusinesses.map(b => b.category))].sort();
@@ -101,6 +106,104 @@ function setupEventListeners() {
     applyFilters();
     App.showToast('Filters cleared', 'info');
   });
+
+  // Toggle View Button
+  document.getElementById('btn-toggle-view').addEventListener('click', toggleView);
+}
+
+function toggleView() {
+  const btn = document.getElementById('btn-toggle-view');
+  const grid = document.getElementById('business-grid');
+  const mapContainer = document.getElementById('browse-map-container');
+
+  if (currentView === 'list') {
+    currentView = 'map';
+    btn.innerHTML = '📋 List View';
+    grid.classList.add('hidden');
+    mapContainer.classList.remove('hidden');
+    
+    // Initialize map
+    initBrowseMap();
+    // Render markers
+    updateMapMarkers();
+  } else {
+    currentView = 'list';
+    btn.innerHTML = '🗺️ Map View';
+    grid.classList.remove('hidden');
+    mapContainer.classList.add('hidden');
+  }
+}
+
+function initBrowseMap() {
+  if (browseMap) {
+    setTimeout(() => {
+      browseMap.invalidateSize();
+    }, 100);
+    return;
+  }
+
+  const defaultLat = 20.5937; // Center of India
+  const defaultLng = 78.9629;
+
+  const isDarkMode = document.documentElement.getAttribute('data-theme') !== 'light';
+  const tileUrl = isDarkMode 
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+  browseMap = L.map('browse-map').setView([defaultLat, defaultLng], 5);
+
+  L.tileLayer(tileUrl, {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    maxZoom: 20
+  }).addTo(browseMap);
+
+  markerGroup = L.featureGroup().addTo(browseMap);
+}
+
+function updateMapMarkers() {
+  if (!browseMap || !markerGroup) return;
+
+  // Clear previous markers
+  markerGroup.clearLayers();
+
+  const list = currentFilteredBusinesses;
+  if (list.length === 0) return;
+
+  list.forEach(biz => {
+    if (biz.latitude && biz.longitude) {
+      const lat = parseFloat(biz.latitude);
+      const lng = parseFloat(biz.longitude);
+      const ratingStars = App.renderStars(biz.rating);
+
+      const popupContent = `
+        <div class="map-popup-card" style="min-width: 180px;">
+          <div style="font-size:0.75rem; color:var(--teal); font-weight:700; text-transform:uppercase; margin-bottom:2px;">${biz.category}</div>
+          <h4 style="font-family:Outfit; margin:0 0 6px 0; font-size:0.95rem; color:var(--text-primary); font-weight:700;">${biz.name}</h4>
+          <div style="display:flex; align-items:center; gap:4px; font-size:0.8rem; margin-bottom:6px;">
+            <span class="stars">${ratingStars}</span>
+            <strong style="color:var(--text-primary)">${biz.rating}</strong>
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:10px;">📍 ${biz.city}</div>
+          <a href="business-detail.html?id=${biz.id}" class="btn btn-primary btn-sm" style="display:block; text-align:center; padding:4px 8px; font-size:0.75rem; font-weight:600; width:100%; border-radius: var(--radius-xs);">View Details</a>
+        </div>
+      `;
+
+      const marker = L.marker([lat, lng])
+        .bindPopup(popupContent);
+
+      markerGroup.addLayer(marker);
+    }
+  });
+
+  // Fit bounds to show all markers
+  try {
+    const bounds = markerGroup.getBounds();
+    if (bounds.isValid()) {
+      browseMap.fitBounds(bounds, { padding: [40, 40] });
+    }
+  } catch (err) {
+    console.error('Error fitting bounds:', err);
+  }
 }
 
 function applyFilters() {
@@ -159,8 +262,16 @@ function applyFilters() {
   // Update Count
   document.getElementById('results-count').textContent = filtered.length;
 
-  // Render
+  // Store globally
+  currentFilteredBusinesses = filtered;
+
+  // Render List View
   renderCards(filtered);
+
+  // Sync Map View markers
+  if (currentView === 'map') {
+    updateMapMarkers();
+  }
 }
 
 function renderCards(list) {

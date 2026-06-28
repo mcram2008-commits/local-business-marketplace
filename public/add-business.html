@@ -6,6 +6,9 @@
   <title>Manage Business — LocalBiz</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/forms.css">
+  <!-- Leaflet Map API -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 <body>
 
@@ -80,6 +83,23 @@
               </div>
             </div>
 
+            <!-- Map Picker -->
+            <div class="form-group">
+              <label class="form-label">Pin Business Location on Map</label>
+              <div id="map-picker-container" style="position:relative; width:100%; height:280px; border-radius:var(--radius-sm); border:1px solid var(--border); overflow:hidden; margin-bottom: 10px;">
+                <div id="biz-map-picker" style="width:100%; height:100%; z-index: 1;"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                  <button type="button" id="btn-geocode-address" class="btn btn-secondary btn-sm" style="padding:6px 12px; font-size:0.8rem;">🔍 Locate Address on Map</button>
+                  <button type="button" id="btn-current-location" class="btn btn-secondary btn-sm" style="padding:6px 12px; font-size:0.8rem; display: inline-flex; align-items: center; gap: 4px;">📍 Use Current Location</button>
+                </div>
+                <span id="geocode-status" style="font-size:0.8rem; color:var(--text-secondary);">Pin is draggable</span>
+              </div>
+              <input type="hidden" id="biz-lat" name="latitude">
+              <input type="hidden" id="biz-lng" name="longitude">
+            </div>
+
             <div class="form-row">
               <!-- Opening Time -->
               <div class="form-group">
@@ -131,6 +151,10 @@
   <script>
     let currentUser = null;
     let editBizId = null;
+    let map = null;
+    let marker = null;
+    const defaultLat = 13.0827; // Chennai
+    const defaultLng = 80.2707;
 
     document.addEventListener('DOMContentLoaded', () => {
       // Guard Owner route
@@ -139,6 +163,9 @@
 
       // Render Navigation
       App.renderNav();
+
+      // Initialize Map Picker
+      initMap();
 
       // Check edit status
       editBizId = App.getParam('id');
@@ -168,10 +195,134 @@
         });
       }
 
+      // Handle geocode button click
+      document.getElementById('btn-geocode-address').addEventListener('click', () => {
+        geocodeAddress(true);
+      });
+
+      // Handle current location button click
+      document.getElementById('btn-current-location').addEventListener('click', () => {
+        useCurrentLocation();
+      });
+
       // Handle submit
       const form = document.getElementById('business-form');
       form.addEventListener('submit', handleFormSubmit);
     });
+
+    function initMap() {
+      const isDarkMode = document.documentElement.getAttribute('data-theme') !== 'light';
+      const tileUrl = isDarkMode 
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+      // Create Leaflet Map
+      map = L.map('biz-map-picker').setView([defaultLat, defaultLng], 12);
+
+      L.tileLayer(tileUrl, {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        maxZoom: 20
+      }).addTo(map);
+
+      // Draggable Marker
+      marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+
+      // Set default hidden inputs
+      document.getElementById('biz-lat').value = defaultLat;
+      document.getElementById('biz-lng').value = defaultLng;
+
+      // Drag event updates coordinates
+      marker.on('dragend', function() {
+        const pos = marker.getLatLng();
+        document.getElementById('biz-lat').value = pos.lat.toFixed(6);
+        document.getElementById('biz-lng').value = pos.lng.toFixed(6);
+      });
+
+      // Map click places pin
+      map.on('click', function(e) {
+        marker.setLatLng(e.latlng);
+        document.getElementById('biz-lat').value = e.latlng.lat.toFixed(6);
+        document.getElementById('biz-lng').value = e.latlng.lng.toFixed(6);
+      });
+    }
+
+    function geocodeAddress(showToast = true) {
+      const address = document.getElementById('biz-address').value.trim();
+      const city = document.getElementById('biz-city').value.trim();
+      const state = document.getElementById('biz-state').value.trim();
+
+      const fullAddress = [address, city, state].filter(Boolean).join(', ');
+      if (!fullAddress) {
+        if (showToast) App.showToast('Please enter address details first', 'warning');
+        return;
+      }
+
+      const statusEl = document.getElementById('geocode-status');
+      if (statusEl) statusEl.textContent = 'Locating...';
+
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}&limit=1`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.length > 0) {
+            const lat = parseFloat(data[0].lat);
+            const lon = parseFloat(data[0].lon);
+
+            if (marker && map) {
+              marker.setLatLng([lat, lon]);
+              map.setView([lat, lon], 15);
+            }
+            document.getElementById('biz-lat').value = lat.toFixed(6);
+            document.getElementById('biz-lng').value = lon.toFixed(6);
+
+            if (statusEl) statusEl.textContent = 'Located successfully!';
+            if (showToast) App.showToast('Location updated on map!', 'success');
+          } else {
+            if (statusEl) statusEl.textContent = 'Location not found';
+            if (showToast) App.showToast('Could not find address on map. Pin manually.', 'warning');
+          }
+        })
+        .catch(err => {
+          if (statusEl) statusEl.textContent = 'Error locating';
+          if (showToast) App.showToast('Geocoding failed. Pin manually.', 'error');
+        });
+    }
+
+    function useCurrentLocation() {
+      if (!navigator.geolocation) {
+        App.showToast('Geolocation is not supported by your browser', 'error');
+        return;
+      }
+
+      const statusEl = document.getElementById('geocode-status');
+      if (statusEl) statusEl.textContent = 'Requesting location...';
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+
+          if (marker && map) {
+            marker.setLatLng([lat, lng]);
+            map.setView([lat, lng], 15);
+          }
+          document.getElementById('biz-lat').value = lat.toFixed(6);
+          document.getElementById('biz-lng').value = lng.toFixed(6);
+
+          if (statusEl) statusEl.textContent = 'Located successfully!';
+          App.showToast('Location pinned to map!', 'success');
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          let errorMsg = 'Could not get current location';
+          if (error.code === error.PERMISSION_DENIED) {
+            errorMsg = 'Location permission denied';
+          }
+          if (statusEl) statusEl.textContent = errorMsg;
+          App.showToast(errorMsg, 'error');
+        },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+      );
+    }
 
     function setupEditForm() {
       const biz = Store.getBusinessById(editBizId);
@@ -203,6 +354,24 @@
       document.getElementById('biz-close').value = biz.closeTime || '20:00';
       document.getElementById('biz-desc').value = biz.description;
       
+      // Pre-fill map coordinates
+      if (biz.latitude && biz.longitude) {
+        const lat = parseFloat(biz.latitude);
+        const lng = parseFloat(biz.longitude);
+        document.getElementById('biz-lat').value = lat;
+        document.getElementById('biz-lng').value = lng;
+        
+        if (marker && map) {
+          marker.setLatLng([lat, lng]);
+          map.setView([lat, lng], 15);
+        }
+      } else {
+        // Fallback: Geocode the address to find marker position
+        setTimeout(() => {
+          geocodeAddress(false);
+        }, 800);
+      }
+
       // Pre-fill logo preview
       if (biz.logo) {
         document.getElementById('biz-logo-url').value = biz.logo;
@@ -263,6 +432,8 @@
       const openTime = document.getElementById('biz-open').value;
       const closeTime = document.getElementById('biz-close').value;
       const description = document.getElementById('biz-desc').value.trim();
+      const latitude = parseFloat(document.getElementById('biz-lat').value) || null;
+      const longitude = parseFloat(document.getElementById('biz-lng').value) || null;
 
       // Perform upload if file selected
       let logoUrl = document.getElementById('biz-logo-url').value;
@@ -273,7 +444,8 @@
       });
 
       const data = {
-        name, category, phone, email, address, city, state, openTime, closeTime, description, logo: logoUrl
+        name, category, phone, email, address, city, state, openTime, closeTime, description, logo: logoUrl,
+        latitude, longitude
       };
 
       if (editBizId) {
