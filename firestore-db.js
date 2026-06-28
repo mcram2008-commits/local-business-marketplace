@@ -5,12 +5,21 @@ const bcrypt = require('bcryptjs');
 let serviceAccount;
 let useMock = false;
 
-try {
-  serviceAccount = require('./serviceAccountKey.json');
-} catch (e) {
-  console.warn("WARNING: serviceAccountKey.json not found in root.");
-  console.warn("Firestore will run in in-memory fallback mode until you place your Firebase serviceAccountKey.json key in the root directory.");
-  useMock = true;
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+  try {
+    serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  } catch (e) {
+    console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT env variable:", e.message);
+    useMock = true;
+  }
+} else {
+  try {
+    serviceAccount = require('./serviceAccountKey.json');
+  } catch (e) {
+    console.warn("WARNING: serviceAccountKey.json not found in root.");
+    console.warn("Firestore will run in in-memory fallback mode until you place your Firebase serviceAccountKey.json key in the root directory.");
+    useMock = true;
+  }
 }
 
 let fdb;
